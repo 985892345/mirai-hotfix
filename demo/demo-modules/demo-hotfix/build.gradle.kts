@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("net.mamoe.mirai-console")
+  kotlin("jvm")
+  kotlin("plugin.serialization")
+  id("net.mamoe.mirai-console")
 }
 
 version = "1.0"
@@ -15,20 +15,27 @@ version = "1.0"
 // 这里写被热修的模块
 val hotfixModule = ":demo"
 
+repositories {
+  maven("https://maven.aliyun.com/repository/public")
+  mavenCentral()
+  maven("https://jitpack.io") // 引入 jitpack
+}
+
 // 创建一个直接打包 jar 的 task
 tasks.register<Jar>(project.name) {
-    group = "hotfix"
-    exclude("META-INF/**")
-    // 会在 build/libs 下生成 jar 包
-    archiveFileName.set("${project.name}.jar")
-    from(sourceSets.main.get().output)
-    from(configurations.runtimeClasspath.get().filter {
-        // 去掉与被热修模块的相同依赖
-        !project(hotfixModule).configurations.runtimeClasspath.get().contains(it)
-    }.map { zipTree(it) })
+  group = "hotfix"
+  exclude("META-INF/**")
+  // 会在 build/libs 下生成 jar 包
+  archiveFileName.set("${project.name}.jar")
+  from(sourceSets.main.get().output)
+  from(configurations.runtimeClasspath.get().filter {
+    // 去掉与被热修模块的相同依赖
+    !project(hotfixModule).configurations.runtimeClasspath.get().contains(it)
+      && it.name.endsWith(".jar")
+  }.map { zipTree(it) })
 }
 
 dependencies {
-    // 依赖被热修的模块
-    compileOnly(project(hotfixModule))
+  // 依赖被热修的模块
+  compileOnly(project(hotfixModule))
 }

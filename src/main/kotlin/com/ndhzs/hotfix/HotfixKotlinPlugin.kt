@@ -48,17 +48,23 @@ abstract class HotfixKotlinPlugin(
   parentCoroutineContext
 ) {
   @Suppress("LeakingThis")
-  private val hotfixCommand = HotfixCommand(this, hotfixDirName, hotfixCommandName, typeHandlers)
+  private val hotfixCommand by lazy {
+    HotfixCommand(this, hotfixDirName, hotfixCommandName, typeHandlers)
+  }
 
   // 热修根目录
-  protected val hotfixRootFile = hotfixCommand.hotfixRootFile
+  protected val hotfixRootFile: File
+    get() = hotfixCommand.hotfixRootFile
   // 热修加载目录
-  protected val hotfixLoadFile = hotfixCommand.hotfixLoadFile
+  protected val hotfixLoadFile: File
+    get() = hotfixCommand.hotfixLoadFile
   // 热修运行目录
-  protected val hotfixRunningFile = hotfixCommand.hotfixRunningFile
+  protected val hotfixRunningFile: File
+    get() = hotfixCommand.hotfixRunningFile
 
   // 热修文件全名与热修文件
-  protected val runningHotfixByFileName: Map<String, HotfixFile> = hotfixCommand.runningHotfixByFileName
+  protected val runningHotfixByFileName: Map<String, HotfixFile>
+    get() = hotfixCommand.runningHotfixByFileName
 
   final override fun onEnable() {
     super.onEnable()

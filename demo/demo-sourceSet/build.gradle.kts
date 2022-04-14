@@ -38,13 +38,19 @@ dependencies {
   implementation("com.github.985892345:mirai-hotfix:0.1")
 }
 
-// 需要新增的 sourceSets 的文件名
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+// 在这里写上需要新增的 sourceSets 的文件名
 val hotfix = arrayOf(
   "hotfix-demo"
 )
-// 构建后，你会在 demo2/src 下看到 hotfix-demo 文件夹，且与 main 有相同的标识
+// 构建后，你会在 src 下会看到 hotfix-demo 文件夹，且与 main 有相同的标识，里面写需要热修的代码
+/////////////////////////////////////////////////////////////////////////////////////
 
-// 这里会专门生成打热修代码的 sourceSets 文件夹，里面写需要热修的代码
+
+
+// 这里会专门生成打热修代码的 sourceSets 文件夹
 sourceSets {
   hotfix.forEach {
     create(it) {
@@ -63,7 +69,7 @@ sourceSets {
 
 // 给 gradle 新增打热修包的任务，
 // 位置在 idea  gradle 侧边栏 Tasks/hotfix/hotfix-demo 中（注意：这是一个单独的项目，请用 idea 单独打开才能看到）
-//
+// 打好的包位置在 build/libs 下
 hotfix.forEach {
   tasks.register<Jar>(it) {
     group = "hotfix"
@@ -74,6 +80,7 @@ hotfix.forEach {
     from(sourceSets.named(it).get().runtimeClasspath.filter { file ->
       // 去掉与 main 中相同的 runtimeClasspath
       !sourceSets.named("main").get().runtimeClasspath.contains(file)
+        && file.name.endsWith(".jar")
     }.map { file -> zipTree(file) })
   }
 }

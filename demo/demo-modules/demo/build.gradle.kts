@@ -7,9 +7,15 @@ plugins {
 group = "com.ndhzs"
 version = "1.0"
 
+repositories {
+    maven("https://maven.aliyun.com/repository/public")
+    mavenCentral()
+    maven("https://jitpack.io")
+}
+
 dependencies {
 
-    // 下面是用于本地测试时依赖本地的 jar 文件
+    // 下面是用于本地测试时依赖本地的 jar 文件，测试使用
 //    fun File.child(name: String): File {
 //        return File(this, name)
 //    }
@@ -19,5 +25,7 @@ dependencies {
 //            rootDir.parentFile.parentFile.child("build").child("libs").toPath()
 //        )
 //    )
+
+    // 这里需要使用 api，为了让热修的模块也能得到依赖
     api("com.github.985892345:mirai-hotfix:0.1")
 }
