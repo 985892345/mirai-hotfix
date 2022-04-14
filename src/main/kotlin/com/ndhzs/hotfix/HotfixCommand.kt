@@ -25,7 +25,7 @@ internal class HotfixCommand(
   typeHandlers: Array<IHotfixSuffixHandler>
 ) : CompositeCommand(
   hotfixPlugin, "fix${hotfixCommandName}",
-  description = "热修的指令",
+  description = "${hotfixCommandName}的热修指令",
 ) {
 
   val hotfixRootFile = File(MiraiConsole.rootDir, "hotfix").apply { mkdirs() }
@@ -128,8 +128,8 @@ internal class HotfixCommand(
   }
 
   private fun findFile(dirFile: File, must: Array<out String> = emptyArray()): Array<File> {
-    return dirFile.listFiles { _, name ->
-      must.all { name.contains(it) }
+    return dirFile.listFiles { dir, name ->
+      must.all { name.contains(it) } && dir != hotfixRunningFile
     } ?: emptyArray()
   }
 

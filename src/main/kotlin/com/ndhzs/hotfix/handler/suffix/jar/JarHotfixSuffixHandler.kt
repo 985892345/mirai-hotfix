@@ -27,7 +27,8 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
     val entries = jarFile.entries()
     while (entries.hasMoreElements()) {
       val element = entries.nextElement()
-      if (!element.isDirectory) {
+      // 只允许启动类在根目录下
+      if (!element.name.contains("/")) {
         val className = element.name
         // 排除掉 Kt.class 结尾、包含 $ 符号的类
         if (className.endsWith(".class")
