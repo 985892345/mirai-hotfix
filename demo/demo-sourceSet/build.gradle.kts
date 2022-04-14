@@ -24,18 +24,18 @@ repositories {
 // 这里给全部源集设置依赖，下面还有一个用于给自定义源集设置依赖
 dependencies {
   // 下面是用于本地测试时依赖本地的 jar 文件，测试使用
-  fun File.child(name: String): File {
-    return File(this, name)
-  }
-  // 注意：这个 implementation 本来并不会给你自己设置的源集添加依赖，
-  // 它只会给 main 源集添加依赖，但我后面让自定义源集依赖上了 main 的 compileClasspath，所以这里设置会给全部都设置
-  implementation(
-    fileTree(
-      rootDir.parentFile.parentFile.child("build").child("libs").toPath()
-    )
-  )
+//  fun File.child(name: String): File {
+//    return File(this, name)
+//  }
+//  // 注意：这个 implementation 本来并不会给你自己设置的源集添加依赖，
+//  // 它只会给 main 源集添加依赖，但我后面让自定义源集依赖上了 main 的 compileClasspath，所以这里设置会给全部都设置
+//  implementation(
+//    fileTree(
+//      rootDir.parentFile.parentFile.child("build").child("libs").toPath()
+//    )
+//  )
 
-//  implementation("com.ndhzs.mirai.hotfix:xxx")
+  implementation("com.ndhzs.mirai.hotfix:0.1")
 }
 
 // 需要新增的 sourceSets 的文件名

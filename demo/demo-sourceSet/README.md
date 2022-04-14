@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.ndhzs.mirai.hotfix:xxx")
+  implementation("com.ndhzs.mirai.hotfix:0.1")
 }
 ````
 
