@@ -19,5 +19,5 @@ dependencies {
 //            rootDir.parentFile.parentFile.child("build").child("libs").toPath()
 //        )
 //    )
-    api("com.ndhzs.mirai.hotfix:0.1")
+    api("com.github.985892345:mirai-hotfix:0.1")
 }

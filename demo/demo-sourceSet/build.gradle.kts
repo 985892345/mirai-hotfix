@@ -35,7 +35,7 @@ dependencies {
 //    )
 //  )
 
-  implementation("com.ndhzs.mirai.hotfix:0.1")
+  implementation("com.github.985892345:mirai-hotfix:0.1")
 }
 
 // 需要新增的 sourceSets 的文件名

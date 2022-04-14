@@ -6,6 +6,7 @@
 ## 使用方式
 
 ### 1、引入依赖
+[![](https://jitpack.io/v/985892345/mirai-hotfix.svg)](https://jitpack.io/#985892345/mirai-hotfix)
 ````kotlin
 repositories {
   // 引入 jitpack 仓库地址
@@ -13,7 +14,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.ndhzs.mirai.hotfix:0.1")
+  implementation("com.github.985892345:mirai-hotfix:xxx")
 }
 ````
 
