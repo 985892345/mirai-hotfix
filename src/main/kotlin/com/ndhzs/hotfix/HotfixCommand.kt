@@ -128,8 +128,8 @@ internal class HotfixCommand(
   }
 
   private fun findFile(dirFile: File, must: Array<out String> = emptyArray()): Array<File> {
-    return dirFile.listFiles { dir, name ->
-      must.all { name.contains(it) } && dir != hotfixRunningFile
+    return dirFile.listFiles { _, name ->
+      must.all { name.contains(it) } && name != hotfixRunningFile.name
     } ?: emptyArray()
   }
 

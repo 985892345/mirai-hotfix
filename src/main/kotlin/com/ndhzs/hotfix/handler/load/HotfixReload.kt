@@ -36,9 +36,6 @@ internal object HotfixReload {
       }
       val runningFile = File(hotfixRunningFile, file.name)
       file.renameTo(runningFile) // 移动到专门运行的文件夹后再加载
-      println(this.javaClass.classLoader)
-      println(hotfixPlugin.javaClass.classLoader)
-      println(hotfixPlugin.javaClass.classLoader.parent)
       try {
         typeHandler.apply {
           onFixLoad(runningFile, hotfixPlugin.javaClass.classLoader) // 让处理者进行加载文件
