@@ -27,5 +27,5 @@ dependencies {
 //    )
 
     // 这里需要使用 api，为了让热修的模块也能得到依赖
-    api("com.github.985892345:mirai-hotfix:0.1")
+    api("com.github.985892345:mirai-hotfix:0.1.1")
 }

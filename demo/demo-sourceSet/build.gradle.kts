@@ -12,48 +12,46 @@ version = "1.0"
 repositories {
   maven("https://maven.aliyun.com/repository/public")
   mavenCentral()
-  maven("https://jitpack.io")
-}
-
-/////////////////////////////////////////////////////////////
-//
-//       下面为配置 sourceSets，实现打热修包的模板写法
-//
-////////////////////////////////////////////////////////////
-
-// 这里给全部源集设置依赖，下面还有一个用于给自定义源集设置依赖
-dependencies {
-  // 下面是用于本地测试时依赖本地的 jar 文件，测试使用
-//  fun File.child(name: String): File {
-//    return File(this, name)
-//  }
-//  // 注意：这个 implementation 本来并不会给你自己设置的源集添加依赖，
-//  // 它只会给 main 源集添加依赖，但我后面让自定义源集依赖上了 main 的 compileClasspath，所以这里设置会给全部都设置
-//  implementation(
-//    fileTree(
-//      rootDir.parentFile.parentFile.child("build").child("libs").toPath()
-//    )
-//  )
-
-  implementation("com.github.985892345:mirai-hotfix:0.1")
+  maven("https://jitpack.io") // 这里要引入 jitpack
 }
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////
-// 在这里写上需要新增的 sourceSets 的文件名
-val hotfix = arrayOf(
-  "hotfix-demo"
-)
-// 构建后，你会在 src 下会看到 hotfix-demo 文件夹，且与 main 有相同的标识，里面写需要热修的代码
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//       这里是固定代码的起始位置，请直接复制到结尾
+//////////////////////////////////////////////////////////////////////
+/**
+ * 该类主要用于给单个源集设置依赖
+ */
+class HotfixDependencyHandlerScope(
+  val sourceSetName: String,
+  val dependencies: DependencyHandler
+) {
+  fun implementation(
+    dependencyNotation: Any
+  ) = dependencies.add("${sourceSetName}Implementation", dependencyNotation)
+  fun implementation(
+    dependencyNotation: String,
+    dependencyConfiguration: ExternalModuleDependency.() -> Unit
+  ) = dependencies.add("${sourceSetName}Implementation", dependencyNotation, dependencyConfiguration)
+  fun compileOnly(
+    dependencyNotation: Any
+  ) = dependencies.add("${sourceSetName}CompileOnly", dependencyNotation)
+  fun compileOnly(
+    dependencyNotation: String,
+    dependencyConfiguration: ExternalModuleDependency.() -> Unit
+  ) = dependencies.add("${sourceSetName}CompileOnly", dependencyNotation, dependencyConfiguration)
+}
 
-
-
-// 这里会专门生成打热修代码的 sourceSets 文件夹
-sourceSets {
-  hotfix.forEach {
-    create(it) {
+/**
+ * 创建自定义源集并引入依赖
+ * @param sourceSetName 源集名字
+ * @param depend 源集依赖，只会给当前添加
+ */
+fun createHotfix(sourceSetName: String, depend: (HotfixDependencyHandlerScope.() -> Unit)? = null) {
+  // 这里会专门生成打热修代码的 sourceSets 文件夹
+  sourceSets {
+    create(sourceSetName) {
       // 依赖 main 的 output
       compileClasspath += sourceSets.named("main").get().output
       // 依赖 main 的 compileClasspath
@@ -65,27 +63,40 @@ sourceSets {
       resources.srcDirs.forEach { file -> file.mkdirs() }
     }
   }
-}
-
-// 给 gradle 新增打热修包的任务，
-// 位置在 idea  gradle 侧边栏 Tasks/hotfix/hotfix-demo 中（注意：这是一个单独的项目，请用 idea 单独打开才能看到）
-// 打好的包位置在 build/libs 下
-hotfix.forEach {
-  tasks.register<Jar>(it) {
+  /**
+   * 给 gradle 新增打热修包的任务
+   * 位置在 idea  gradle 侧边栏 Tasks/hotfix/xxx 中（注意：这是一个单独的项目，请用 idea 单独打开才能看到）
+   * 打好的包位置在 build/libs 下
+   */
+  tasks.register<Jar>(sourceSetName) {
     group = "hotfix"
     exclude("META-INF/**")
-    archiveFileName.set("$it.jar")
-    from(sourceSets.named(it).get().output)
+    archiveFileName.set("$sourceSetName.jar")
+    from(sourceSets.named(sourceSetName).get().output)
     // 增加 runtimeClasspath
-    from(sourceSets.named(it).get().runtimeClasspath.filter { file ->
+    from(sourceSets.named(sourceSetName).get().runtimeClasspath.filter { file ->
       // 去掉与 main 中相同的 runtimeClasspath
-      !sourceSets.named("main").get().runtimeClasspath.contains(file)
-        && file.name.endsWith(".jar")
+      !sourceSets.named("main").get().runtimeClasspath.contains(file) && file.name.endsWith(".jar")
     }.map { file -> zipTree(file) })
   }
+  // 设置单个源集的依赖
+  dependencies {
+    depend?.invoke(HotfixDependencyHandlerScope(sourceSetName, dependencies))
+  }
+}
+//////////////////////////////////////////////////////////////////////
+//           这里是固定代码的结尾位置，以上内容请直接复制
+//////////////////////////////////////////////////////////////////////
+
+
+
+
+// 这里给全部源集设置依赖
+dependencies {
+  implementation("com.github.985892345:mirai-hotfix:0.1.1")
 }
 
-dependencies {
-  // 使用这种方式单独给源集设置依赖，必须以上面设置的 hotfix-demo 开头
-  "hotfix-demoImplementation"("com.google.code.gson:gson:2.9.0")
+// 这里用于设置自定义源集并引入依赖
+createHotfix("hotfix-demo") {
+  implementation("com.google.code.gson:gson:2.9.0")
 }
