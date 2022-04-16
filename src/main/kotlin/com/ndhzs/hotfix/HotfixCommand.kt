@@ -147,6 +147,7 @@ internal class HotfixCommand(
         .weave("无法卸载", reloadState.removeState?.closeFailureList?.map { it.file })
         .weave("删除失败", reloadState.removeState?.deleteFailureList?.map { it.file })
         .weave("读取失败", reloadState.readFailureList)
+        .weave("移动失败", reloadState.moveFailureList)
         .toString()
     }
     return "未找到该文件！"

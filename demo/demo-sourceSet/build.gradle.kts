@@ -93,7 +93,7 @@ fun createHotfix(sourceSetName: String, depend: (HotfixDependencyHandlerScope.()
 
 // 这里给全部源集设置依赖
 dependencies {
-  implementation("com.github.985892345:mirai-hotfix:0.1.1")
+  implementation("com.github.985892345:mirai-hotfix:0.1.1") // 该版本可能不是最新版
 }
 
 // 这里用于设置自定义源集并引入依赖

@@ -3,7 +3,10 @@ package com.ndhzs.hotfix.handler.load
 import com.ndhzs.hotfix.HotfixKotlinPlugin
 import com.ndhzs.hotfix.handler.suffix.IHotfixSuffixHandler
 import net.mamoe.mirai.console.command.CommandSender
+import okio.IOException
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 /**
  * 实现热修文件加载功能的工具类
@@ -22,8 +25,17 @@ internal object HotfixReload {
     }
     val reloadState = ReloadState()
     val allowLoadFileList = mutableListOf<File>() // 记录允许进行加载的文件 list，包含被成功卸载的文件
-    reloadState.removeState = HotfixRemove.run { removeFiles(files, runningHotfixByFileName) }?.apply {
-      allowLoadFileList.addAll(removeSuccessList.map { it.file })
+    reloadState.removeState = HotfixRemove.run {
+      removeFiles(
+        files,
+        runningHotfixByFileName
+      )
+    }?.apply {
+      allowLoadFileList.addAll(
+        files.filter { file ->
+          removeSuccessList.any { it.file.name == file.name }
+        }
+      )
       allowLoadFileList.addAll(noLoadList)
     }
 
@@ -35,15 +47,21 @@ internal object HotfixReload {
         continue
       }
       val runningFile = File(hotfixRunningFile, file.name)
-      file.renameTo(runningFile) // 移动到专门运行的文件夹后再加载
       try {
-        typeHandler.apply {
-          onFixLoad(runningFile, hotfixPlugin.javaClass.classLoader) // 让处理者进行加载文件
+        // 移动到专门运行的文件夹后再加载
+        Files.move(file.toPath(), runningFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        try {
+          typeHandler.apply {
+            onFixLoad(runningFile, hotfixPlugin.javaClass.classLoader) // 让处理者进行加载文件
+          }
+          reloadState.reloadSuccessList.add(HotfixKotlinPlugin.HotfixFile(runningFile, typeHandler))
+        } catch (e: ClassNotFoundException) {
+          e.printStackTrace()
+          reloadState.readFailureList.add(file) // 这里是加载失败的时候
         }
-        reloadState.reloadSuccessList.add(HotfixKotlinPlugin.HotfixFile(runningFile, typeHandler))
-      } catch (e: ClassNotFoundException) {
+      } catch (e: IOException) {
         e.printStackTrace()
-        reloadState.readFailureList.add(file) // 这里是加载失败的时候
+        reloadState.moveFailureList.add(file)
       }
     }
     return reloadState
@@ -61,6 +79,9 @@ internal object HotfixReload {
 
     // 处理者加载失败的，可能是 ClassLoader 报的错，或者是读取报的错
     val readFailureList = mutableListOf<File>()
+    
+    // 移动失败
+    val moveFailureList = mutableListOf<File>()
 
     var removeState: HotfixRemove.RemoveState? = null
   }

@@ -66,9 +66,7 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
     suspend fun CommandSender.unload(): Boolean {
       if (hotfixUsers.all { it.onRemoveEntrance(entrance) }) {
         entrance.apply { onFixUnload() }
-        withContext(Dispatchers.IO) {
-          classLoader.close() // 关闭对资源的读取
-        }
+        classLoader.close() // 关闭对资源的读取
         return true
       }
       return false
