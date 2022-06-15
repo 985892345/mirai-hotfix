@@ -83,6 +83,7 @@ internal object HotfixReload {
     // 移动失败
     val moveFailureList = mutableListOf<File>()
 
+    // 卸载状态
     var removeState: HotfixRemove.RemoveState? = null
   }
 }

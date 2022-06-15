@@ -59,9 +59,11 @@ internal class HotfixCommand(
   }
 
   /**
+   * 重新加载某个热修包，会先卸载旧的热修包（如果有的话）再加载新的热修包
+   *
    * 命令 /fix... reload keyword1 keyword2 keyword3...
    *
-   * keyword 取并集
+   * @param keyword 文件名的关键字，当输入多个时会取并集
    */
   @SubCommand
   suspend fun CommandSender.reload(vararg keyword: String) {
@@ -93,9 +95,11 @@ internal class HotfixCommand(
   }
 
   /**
+   * 移除某个热修包
+   *
    * 命令 /fix... remove keyword1 keyword2 keyword3...
    *
-   * keyword 取并集
+   * @param keyword 文件名的关键字，当输入多个时会取并集
    */
   @SubCommand
   suspend fun CommandSender.remove(vararg keyword: String) {
@@ -118,7 +122,11 @@ internal class HotfixCommand(
   }
 
   /**
+   * 查看记载了哪些热修包
+   *
    * 命令 /fix... list keyword
+   *
+   * @param keyword 文件名的关键字，当输入多个时会取并集
    */
   @SubCommand
   suspend fun CommandSender.list(vararg keyword: String) {

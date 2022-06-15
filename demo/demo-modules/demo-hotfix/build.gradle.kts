@@ -17,8 +17,8 @@ val hotfixModule = ":demo"
 
 repositories {
   maven("https://maven.aliyun.com/repository/public")
-  mavenCentral()
   maven("https://jitpack.io") // 引入 jitpack
+  mavenCentral()
 }
 
 // 创建一个直接打包 jar 的 task
@@ -36,6 +36,6 @@ tasks.register<Jar>(project.name) {
 }
 
 dependencies {
-  // 依赖被热修的模块
+  // 依赖被热修的模块，注意使用 compileOnly
   compileOnly(project(hotfixModule))
 }

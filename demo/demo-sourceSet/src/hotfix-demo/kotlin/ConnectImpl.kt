@@ -3,7 +3,9 @@ import com.ndhzs.IConnect
 import net.mamoe.mirai.console.command.CommandSender
 
 /**
- * 这是热修文件的启动类
+ * 实现在 main 源集中定义的 [IConnect] 接口
+ *
+ * 在热修成功后即可进行通信
  */
 class ConnectImpl : IConnect {
 

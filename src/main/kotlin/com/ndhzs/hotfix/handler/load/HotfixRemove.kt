@@ -38,9 +38,9 @@ internal object HotfixRemove {
       }
     }
     if (removeState.removeSuccessList.isNotEmpty()) {
-      delay(100) // 延迟一会，让其他协程或线程能够有停止的时间
+      delay(10) // 延迟一会，让其他协程或线程能够有停止的时间
       System.gc() // gc 掉对文件持有的引用，不然文件无法被删除
-      delay(100)
+      delay(10)
       removeState.removeSuccessList.forEach {
         try {
           Files.delete(it.file.toPath())
