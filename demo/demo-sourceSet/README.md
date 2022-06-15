@@ -43,4 +43,8 @@ dependencies {
 > 3、推荐使用一些 idea 插件进行一键部署，比如：Alibaba Cloud Toolkit  
 > 4、如果你的项目名称为 demo，则热修命令为 fixdemo，该命令可以自定义，自定义请看 `HotfixKotlinPlugin` 类
 
+
+## 其他示例
+- [mirai-younger-study](https://github.com/985892345/mirai-younger-study): 用来提醒同学交青年大学习截图的 `miria` 插件
+
  

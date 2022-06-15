@@ -65,6 +65,7 @@ internal class HotfixCommand(
    *
    * @param keyword 文件名的关键字，当输入多个时会取并集
    */
+  @Description("重新加载某个热修包")
   @SubCommand
   suspend fun CommandSender.reload(vararg keyword: String) {
     sendMessage(
@@ -101,6 +102,7 @@ internal class HotfixCommand(
    *
    * @param keyword 文件名的关键字，当输入多个时会取并集
    */
+  @Description("移除某个热修包")
   @SubCommand
   suspend fun CommandSender.remove(vararg keyword: String) {
     sendMessage(
@@ -122,12 +124,13 @@ internal class HotfixCommand(
   }
 
   /**
-   * 查看记载了哪些热修包
+   * 查看加载了哪些热修包
    *
    * 命令 /fix... list keyword
    *
    * @param keyword 文件名的关键字，当输入多个时会取并集
    */
+  @Description("查看加载了哪些热修包")
   @SubCommand
   suspend fun CommandSender.list(vararg keyword: String) {
     sendMessage(
