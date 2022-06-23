@@ -1,7 +1,4 @@
 .gradle
 .idea
-build/classes
-build/kotlin
-build/snapshot
-build/tmp
+build
 

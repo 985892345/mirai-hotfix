@@ -5,17 +5,14 @@
 
 ## 使用方式
 
-### 1、引入依赖
-[![](https://jitpack.io/v/985892345/mirai-hotfix.svg)](https://jitpack.io/#985892345/mirai-hotfix)
+### 1、引入依赖和插件
 ````kotlin
-repositories {
-  // 引入 jitpack 仓库地址
-  maven("https://jitpack.io")
+plugins {
+  // 版本号在这里查看：https://plugins.gradle.org/plugin/io.github.985892345.mirai-hotfix
+  id("io.github.985892345.mirai-hotfix") version "1.0"
 }
 
-dependencies {
-  implementation("com.github.985892345:mirai-hotfix:xxx")
-}
+// 插件中已经自动依赖了 mirai-hotfix
 ````
 
 ### 2、继承 HotfixKotlinPlugin
@@ -23,17 +20,30 @@ dependencies {
 
  具体可看：[DemoSourceSet](src/main/kotlin/com/ndhzs/DemoSourceSet.kt)
 
-### 3、修改 build.gradle
- 需要修改 `build.gradle` 来新增 `sourceSet` 文件夹
+### 3、新增 SourceSet
+```kotlin
+hotfix {
+  // 新建了一个 hotfix-demo 源集，且会自动生成打包该源集的命令 gradlew hotfix-demo
+  createHotfix("hotfix-demo") {
+    // 这里面写该源集单独使用的依赖
+    implementation("com.google.code.gson:gson:2.9.0")
+  }
 
- 这里提供一个模板: [build.gradle.kts](build.gradle.kts)
+  // 可以多写几个，但源集之间并不会自动依赖
+}
+```
+注意事项：
+- 新建的源集会自动依赖 main
+- 多个新增的源集并不会自动依赖
+
+ 可以参考: [build.gradle.kts](build.gradle.kts)
 
 ### 4、新建用于交互的接口
  在 main 源集中新建一个接口来进行通信，比如例子中的 [IConnect](src/main/kotlin/com/ndhzs/IConnect.kt)，
  然后在上面建好的源集中实现该接口
 
 ### 5、部署热修文件
-- 打包用于热修的 `sourceSet`
+- 打包用于热修的源集，打包命令已自动生成
 - 部署到 `/控制台/hotfix/demo/` 目录下
 - 执行命令：`fixdemo reload [keyword]`
 - 机器人返回加载成功，则热修成功，热修文件会被剪切到 `.run` 文件夹下
