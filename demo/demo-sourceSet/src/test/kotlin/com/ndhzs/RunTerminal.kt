@@ -24,7 +24,7 @@ suspend fun main() {
   pluginInstance.load()
   pluginInstance.enable()
 
-  val bot = MiraiConsole.addBot(
+  MiraiConsole.addBot(
     Bot_username,
     Bot_password
   ) {
