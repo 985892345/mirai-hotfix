@@ -1,20 +1,10 @@
 plugins {
-  val kotlinVersion = "1.6.21"
+  val kotlinVersion = "1.7.10"
   kotlin("jvm") version kotlinVersion
   kotlin("plugin.serialization") version kotlinVersion
 
-  id("net.mamoe.mirai-console") version "2.11.1"
-  id("io.github.985892345.gradle-plugin") // 引入该插件
-}
-
-buildscript {
-  repositories {
-    maven { setUrl("../demo-sourceSet-gradle-plugin/gradle-plugin/build/maven") }
-    maven { setUrl("build/maven") }
-  }
-  dependencies {
-    classpath("io.github.985892345", "gradle-plugin", "1.1-alpha3")
-  }
+  id("net.mamoe.mirai-console") version "2.12.1"
+  id("io.github.985892345.mirai-hotfix") version "1.1"// 引入该插件
 }
 
 group = "io.github.985892345"
@@ -32,7 +22,7 @@ dependencies {
 
 hotfix {
   // 这里用于设置自定义源集并引入该源集单独使用的依赖，且会生成打包该源集的命令 gradlew hotfix-demo
-  createHotfix("hotfix-demo") {
+  createHotfix("hotfixDemo") {
     implementation("com.google.code.gson:gson:2.9.0")
   }
   

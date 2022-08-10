@@ -1,6 +1,7 @@
 plugins {
   kotlin("jvm")
   id("io.github.985892345.mirai-hotfix")
+  id("net.mamoe.mirai-console") version "2.12.1"
 }
 
 group = "org.example"
@@ -15,7 +16,5 @@ dependencies {
 }
 
 hotfix {
-  createHotfix("hotfix") {
-  
-  }
+  createHotfix("hotfix")
 }

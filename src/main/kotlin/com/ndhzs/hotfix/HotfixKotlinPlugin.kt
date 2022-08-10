@@ -47,7 +47,6 @@ abstract class HotfixKotlinPlugin(
   description,
   parentCoroutineContext
 ) {
-  @Suppress("LeakingThis")
   private val hotfixCommand by lazy {
     HotfixCommand(this, hotfixDirName, hotfixCommandName, typeHandlers)
   }
