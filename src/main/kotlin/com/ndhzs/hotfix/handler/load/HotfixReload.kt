@@ -58,6 +58,8 @@ internal object HotfixReload {
         } catch (e: ClassNotFoundException) {
           e.printStackTrace()
           reloadState.readFailureList.add(file) // 这里是加载失败的时候
+          // 失败了就移动回去
+          Files.move(runningFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
       } catch (e: IOException) {
         e.printStackTrace()

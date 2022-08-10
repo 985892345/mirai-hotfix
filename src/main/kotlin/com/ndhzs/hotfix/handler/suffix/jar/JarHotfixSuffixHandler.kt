@@ -13,7 +13,7 @@ import java.util.jar.JarFile
  *
  * 如果要使用热修文件的话，请实现 [JarHotfixUser] 接口
  *
- * **NOTE：**为了快速读取，启动类规定放在 jar 根路径下
+ * **NOTE：** 为了快速读取，启动类规定只能放在 jar 根路径下
  */
 object JarHotfixSuffixHandler : IHotfixSuffixHandler {
 
@@ -37,7 +37,7 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
         ) {
           val clazz = classLoader.loadClass(className.substringBeforeLast("."))
           if (JarEntrance::class.java.isAssignableFrom(clazz)) {
-            val entrance = clazz.getConstructor().newInstance() as JarEntrance
+            val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
             entrance.apply { onFixLoad() }
             jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
           }

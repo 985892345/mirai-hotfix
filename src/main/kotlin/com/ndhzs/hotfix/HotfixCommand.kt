@@ -196,11 +196,11 @@ internal class HotfixCommand(
     if (list == null || ignoreEmpty && list.isEmpty()) {
       return this
     }
-    append(str).append("：").append(list.size).append("\n")
+    append(str).append("：").appendLine(list.size)
     repeat(list.size) {
       append("${it + 1}、").append(list[it].name)
       if (it < list.size - 1) {
-        append("\n")
+        append('\n')
       }
     }
     return this
