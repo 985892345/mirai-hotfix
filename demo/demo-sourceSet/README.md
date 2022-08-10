@@ -6,10 +6,11 @@
 ## 使用方式
 
 ### 1、引入依赖和插件
+**版本号：**[![](https://jitpack.io/v/985892345/mirai-hotfix.svg)](https://jitpack.io/#985892345/mirai-hotfix)
 ````kotlin
 plugins {
-  // 版本号在这里查看：https://plugins.gradle.org/plugin/io.github.985892345.mirai-hotfix
-  id("io.github.985892345.mirai-hotfix") version "1.0"
+  // 版本号与 mirai-hotfix 保持一致，请看上面的标签
+  id("io.github.985892345.mirai-hotfix") version "x.x"
 }
 
 // 插件中已经自动依赖了 mirai-hotfix

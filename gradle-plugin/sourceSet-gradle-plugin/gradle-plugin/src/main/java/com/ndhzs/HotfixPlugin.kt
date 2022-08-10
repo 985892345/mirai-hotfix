@@ -72,6 +72,6 @@ class HotfixPlugin : Plugin<Project> {
   
   private fun Project.dependMiraiHotfix() {
     repositories.maven { it.setUrl("https://jitpack.io") }
-    dependencies.add("implementation", "com.github.985892345:mirai-hotfix:0.2.1")
+    dependencies.add("implementation", "com.github.985892345:mirai-hotfix:1.1")
   }
 }
