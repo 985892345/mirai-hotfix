@@ -4,7 +4,17 @@ plugins {
   kotlin("plugin.serialization") version kotlinVersion
 
   id("net.mamoe.mirai-console") version "2.11.1"
-  id("io.github.985892345.mirai-hotfix") version "1.0" // 引入该插件
+  id("io.github.985892345.gradle-plugin") // 引入该插件
+}
+
+buildscript {
+  repositories {
+    maven { setUrl("../demo-sourceSet-gradle-plugin/gradle-plugin/build/maven") }
+    maven { setUrl("build/maven") }
+  }
+  dependencies {
+    classpath("io.github.985892345", "gradle-plugin", "1.1-alpha3")
+  }
 }
 
 group = "io.github.985892345"

@@ -1,6 +1,6 @@
 plugins {
-  kotlin("jvm") version "1.6.21"
-  id("maven-publish")
+  kotlin("jvm") version "1.7.10"
+  `maven-publish`
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-  val miraiVersion = "2.11.1"
+  val miraiVersion = "2.12.1"
   compileOnly("net.mamoe:mirai-core:$miraiVersion") // mirai-core 的 API
   compileOnly("net.mamoe:mirai-console:$miraiVersion") // 后端
 }
