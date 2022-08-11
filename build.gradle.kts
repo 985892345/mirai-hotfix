@@ -14,8 +14,7 @@ dependencies {
   compileOnly("net.mamoe:mirai-console:$miraiVersion") // 后端
 }
 
-group = "com.ndhzs"
-version = "0.1"
+version = "1.2"
 
 publishing {
   publications {

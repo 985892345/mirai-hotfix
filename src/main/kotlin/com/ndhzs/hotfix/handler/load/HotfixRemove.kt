@@ -24,7 +24,7 @@ internal object HotfixRemove {
       val hotfixFile = runningHotfixByFileName[it.name]
       if (hotfixFile != null) {
         try {
-          if (hotfixFile.hotfixSuffixHandler.run { onFixUnload(it) }) {
+          if (hotfixFile.hotfixSuffixHandler.run { onFixUnload(this@removeFiles, it) }) {
             removeState.removeSuccessList.add(hotfixFile)
           } else {
             removeState.unloadFailureList.add(hotfixFile)

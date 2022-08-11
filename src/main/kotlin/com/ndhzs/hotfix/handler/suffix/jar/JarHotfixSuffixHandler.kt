@@ -17,11 +17,12 @@ import java.util.jar.JarFile
  */
 object JarHotfixSuffixHandler : IHotfixSuffixHandler {
 
-  override val typeSuffix = "jar"
+  override val typeSuffix: String
+    get() = "jar"
 
   internal val jarByFileName = mutableMapOf<String, Jar>()
 
-  override suspend fun CommandSender.onFixLoad(file: File, pluginClassLoader: ClassLoader) {
+  override suspend fun onFixLoad(sender: CommandSender, file: File, pluginClassLoader: ClassLoader) {
     val classLoader = URLClassLoader(arrayOf(file.toURI().toURL()), pluginClassLoader)
     val jarFile = withContext(Dispatchers.IO) { JarFile(file) }
     val entries = jarFile.entries()
@@ -38,7 +39,7 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
           val clazz = classLoader.loadClass(className.substringBeforeLast("."))
           if (JarEntrance::class.java.isAssignableFrom(clazz)) {
             val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
-            entrance.apply { onFixLoad() }
+            entrance.apply { onFixLoad(sender) }
             jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
           }
         }
@@ -46,8 +47,8 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
     }
   }
 
-  override suspend fun CommandSender.onFixUnload(file: File): Boolean {
-    jarByFileName[file.name]?.apply { unload() }
+  override suspend fun onFixUnload(sender: CommandSender, file: File): Boolean {
+    jarByFileName[file.name]?.apply { unload(sender) }
     jarByFileName.remove(file.name)
     return true
   }
@@ -63,9 +64,9 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
      *
      * **NOTE:** 这里只是移去了引用，但必须要调用 System.gc() 用于彻底删除引用，这样本地文件才可以被覆盖
      */
-    suspend fun CommandSender.unload(): Boolean {
+    suspend fun unload(sender: CommandSender): Boolean {
       if (hotfixUsers.all { it.onRemoveEntrance(entrance) }) {
-        entrance.apply { onFixUnload() }
+        entrance.apply { onFixUnload(sender) }
         classLoader.close() // 关闭对资源的读取
         return true
       }

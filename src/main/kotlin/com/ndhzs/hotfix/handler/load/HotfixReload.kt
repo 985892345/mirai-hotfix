@@ -52,7 +52,7 @@ internal object HotfixReload {
         Files.move(file.toPath(), runningFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         try {
           typeHandler.apply {
-            onFixLoad(runningFile, hotfixPlugin.javaClass.classLoader) // 让处理者进行加载文件
+            onFixLoad(this@reloadFiles, runningFile, hotfixPlugin.javaClass.classLoader) // 让处理者进行加载文件
           }
           reloadState.reloadSuccessList.add(HotfixKotlinPlugin.HotfixFile(runningFile, typeHandler))
         } catch (e: ClassNotFoundException) {

@@ -16,11 +16,11 @@ interface JarEntrance {
    *
    * 如果重启了控制台，则会在控制台刚加载时回调，[CommandSender] 为 [ConsoleCommandSender]
    */
-  suspend fun CommandSender.onFixLoad()
+  suspend fun onFixLoad(sender: CommandSender)
 
   /**
    * 需要卸载时回调
    * @return 返回 true，则允许卸载；false 则不允许卸载
    */
-  suspend fun CommandSender.onFixUnload(): Boolean
+  suspend fun onFixUnload(sender: CommandSender): Boolean
 }
