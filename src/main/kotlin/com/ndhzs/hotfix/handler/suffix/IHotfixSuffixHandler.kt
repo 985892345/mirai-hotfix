@@ -29,7 +29,7 @@ interface IHotfixSuffixHandler {
    * @param file File 为 [HotfixKotlinPlugin.hotfixRootFile] 下具体的某个文件，因为在加载前会先移动到 .run 文件夹下，如果加载失败，会移动回去
    */
   @Throws(ClassNotFoundException::class)
-  suspend fun onFixLoad(sender: CommandSender, file: File, pluginClassLoader: ClassLoader)
+  fun CommandSender.onFixLoad(file: File, pluginClassLoader: ClassLoader)
 
   /**
    * 卸载此文件
@@ -41,5 +41,5 @@ interface IHotfixSuffixHandler {
    * @param file File 为 [HotfixKotlinPlugin.hotfixRootFile] 下具体的某个文件，因为在加载前会先移动到 .run 文件夹下
    * @return 返回 true，表示能够卸载；返回 false，表示不允许卸载
    */
-  suspend fun onFixUnload(sender: CommandSender, file: File): Boolean
+  fun CommandSender.onFixUnload(file: File): Boolean
 }

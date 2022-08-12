@@ -2,6 +2,7 @@ package com.ndhzs.hotfix.handler.suffix.jar
 
 import com.ndhzs.hotfix.handler.suffix.IHotfixSuffixHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.console.command.CommandSender
 import java.io.File
@@ -22,33 +23,35 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
 
   internal val jarByFileName = mutableMapOf<String, Jar>()
 
-  override suspend fun onFixLoad(sender: CommandSender, file: File, pluginClassLoader: ClassLoader) {
-    val classLoader = URLClassLoader(arrayOf(file.toURI().toURL()), pluginClassLoader)
-    val jarFile = withContext(Dispatchers.IO) { JarFile(file) }
-    val entries = jarFile.entries()
-    while (entries.hasMoreElements()) {
-      val element = entries.nextElement()
-      // 只允许启动类在根目录下
-      if (!element.name.contains("/")) {
-        val className = element.name
-        // 排除掉 Kt.class 结尾、包含 $ 符号的类
-        if (className.endsWith(".class")
-          && !className.endsWith("Kt.class")
-          && !className.contains("$")
-        ) {
-          val clazz = classLoader.loadClass(className.substringBeforeLast("."))
-          if (JarEntrance::class.java.isAssignableFrom(clazz)) {
-            val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
-            entrance.apply { onFixLoad(sender) }
-            jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
+  override fun CommandSender.onFixLoad(file: File, pluginClassLoader: ClassLoader) {
+    launch {
+      val classLoader = URLClassLoader(arrayOf(file.toURI().toURL()), pluginClassLoader)
+      val jarFile = withContext(Dispatchers.IO) { JarFile(file) }
+      val entries = jarFile.entries()
+      while (entries.hasMoreElements()) {
+        val element = entries.nextElement()
+        // 只允许启动类在根目录下
+        if (!element.name.contains("/")) {
+          val className = element.name
+          // 排除掉 Kt.class 结尾、包含 $ 符号的类
+          if (className.endsWith(".class")
+            && !className.endsWith("Kt.class")
+            && !className.contains("$")
+          ) {
+            val clazz = classLoader.loadClass(className.substringBeforeLast("."))
+            if (JarEntrance::class.java.isAssignableFrom(clazz)) {
+              val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
+              entrance.apply { onFixLoad() }
+              jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
+            }
           }
         }
       }
     }
   }
 
-  override suspend fun onFixUnload(sender: CommandSender, file: File): Boolean {
-    jarByFileName[file.name]?.apply { unload(sender) }
+  override fun CommandSender.onFixUnload(file: File): Boolean {
+    jarByFileName[file.name]?.apply { unload(this@onFixUnload) }
     jarByFileName.remove(file.name)
     return true
   }
@@ -64,9 +67,9 @@ object JarHotfixSuffixHandler : IHotfixSuffixHandler {
      *
      * **NOTE:** 这里只是移去了引用，但必须要调用 System.gc() 用于彻底删除引用，这样本地文件才可以被覆盖
      */
-    suspend fun unload(sender: CommandSender): Boolean {
+    fun unload(sender: CommandSender): Boolean {
       if (hotfixUsers.all { it.onRemoveEntrance(entrance) }) {
-        entrance.apply { onFixUnload(sender) }
+        entrance.apply { sender.onFixUnload() }
         classLoader.close() // 关闭对资源的读取
         return true
       }

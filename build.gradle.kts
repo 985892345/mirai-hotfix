@@ -14,12 +14,18 @@ dependencies {
   compileOnly("net.mamoe:mirai-console:$miraiVersion") // 后端
 }
 
-version = "1.2"
+group = "io.github.985892345"
+version = "1.3"
 
 publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
+    }
+    repositories {
+      maven {
+        url = uri("$buildDir/local")
+      }
     }
   }
 }

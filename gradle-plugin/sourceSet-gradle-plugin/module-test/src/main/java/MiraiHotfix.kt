@@ -9,13 +9,12 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
  */
 class MiraiHotfix : HotfixKotlinPlugin(
   JvmPluginDescription(
-    id = "com.ndhzs.mirai-younger-study",
-    name = "催同学交青年大学习",
+    id = "com.ndhzs.mirai-hotfix-test",
+    name = "测试 hotfix 的插件",
     version = "1.0",
   ) {
     author("985892345")
-  },
-  hotfixCommandName = "younger"
+  }
 ) {
 
 }

@@ -1,6 +1,7 @@
 package com.ndhzs.hotfix.handler.load
 
 import com.ndhzs.hotfix.HotfixKotlinPlugin
+import com.ndhzs.hotfix.handler.load.HotfixReload.reloadFiles
 import com.ndhzs.hotfix.handler.suffix.IHotfixSuffixHandler
 import net.mamoe.mirai.console.command.CommandSender
 import okio.IOException
@@ -52,7 +53,7 @@ internal object HotfixReload {
         Files.move(file.toPath(), runningFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         try {
           typeHandler.apply {
-            onFixLoad(this@reloadFiles, runningFile, hotfixPlugin.javaClass.classLoader) // 让处理者进行加载文件
+            this@reloadFiles.onFixLoad(runningFile, hotfixPlugin.javaClass.classLoader) // 让处理者进行加载文件
           }
           reloadState.reloadSuccessList.add(HotfixKotlinPlugin.HotfixFile(runningFile, typeHandler))
         } catch (e: ClassNotFoundException) {

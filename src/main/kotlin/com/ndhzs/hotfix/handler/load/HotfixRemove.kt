@@ -1,6 +1,7 @@
 package com.ndhzs.hotfix.handler.load
 
 import com.ndhzs.hotfix.HotfixKotlinPlugin
+import com.ndhzs.hotfix.handler.load.HotfixRemove.removeFiles
 import kotlinx.coroutines.delay
 import net.mamoe.mirai.console.command.CommandSender
 import okio.IOException
@@ -24,7 +25,7 @@ internal object HotfixRemove {
       val hotfixFile = runningHotfixByFileName[it.name]
       if (hotfixFile != null) {
         try {
-          if (hotfixFile.hotfixSuffixHandler.run { onFixUnload(this@removeFiles, it) }) {
+          if (hotfixFile.hotfixSuffixHandler.run { this@removeFiles.onFixUnload(it) }) {
             removeState.removeSuccessList.add(hotfixFile)
           } else {
             removeState.unloadFailureList.add(hotfixFile)

@@ -17,10 +17,10 @@ class ConnectImpl : IConnect {
     return gson.toString()
   }
 
-  override suspend fun CommandSender.onFixLoad() {
+  override fun CommandSender.onFixLoad() {
   }
 
-  override suspend fun CommandSender.onFixUnload(): Boolean {
+  override fun CommandSender.onFixUnload(): Boolean {
     return true
   }
 }

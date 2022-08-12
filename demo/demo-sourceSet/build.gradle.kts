@@ -4,7 +4,7 @@ plugins {
   kotlin("plugin.serialization") version kotlinVersion
 
   id("net.mamoe.mirai-console") version "2.12.1"
-  id("io.github.985892345.mirai-hotfix") version "1.2"// 引入该插件
+  id("io.github.985892345.mirai-hotfix") version "1.3"// 引入该插件
 }
 
 group = "io.github.985892345"
