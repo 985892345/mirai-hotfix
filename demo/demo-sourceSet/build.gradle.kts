@@ -21,7 +21,7 @@ dependencies {
 }
 
 hotfix {
-  // 这里用于设置自定义源集并引入该源集单独使用的依赖，且会生成打包该源集的命令 gradlew hotfix-demo
+  // 这里用于设置自定义源集并引入该源集单独使用的依赖，且会生成打包该源集的命令 gradlew hotfixDemo
   createHotfix("hotfixDemo") {
     implementation("com.google.code.gson:gson:2.9.0")
   }
@@ -31,9 +31,9 @@ hotfix {
 
 
 /*
-* 1、hotfix-demo 源集中主要写逻辑实现代码，main 源集中定义插件命令
+* 1、hotfixDemo 源集中主要写逻辑实现代码，main 源集中定义插件命令
 *
-* 2、新建的 hotfix-demo 源集会自动依赖 main 源集，即可以实现在热修后调用 main 源集中的代码
+* 2、新建的 hotfixDemo 源集会自动依赖 main 源集，即可以实现在热修后调用 main 源集中的代码
 *
-* 3、调用 gradlew hotfix-demo 即可进行打包成 jar，文件在 /build/libs 下
+* 3、调用 gradlew hotfixDemo 即可进行打包成 jar，文件在 /build/libs 下
 * */
