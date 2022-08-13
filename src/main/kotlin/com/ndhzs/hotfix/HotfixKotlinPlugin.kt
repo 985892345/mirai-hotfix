@@ -52,18 +52,18 @@ abstract class HotfixKotlinPlugin(
   }
 
   // 热修根目录
-  protected val hotfixRootFile: File
+  val hotfixRootFile: File
     get() = hotfixCommand.hotfixRootFile
   // 热修加载目录
-  protected val hotfixLoadFile: File
+  val hotfixLoadFile: File
     get() = hotfixCommand.hotfixLoadFile
   // 热修运行目录
-  protected val hotfixRunningFile: File
+  val hotfixRunningFile: File
     get() = hotfixCommand.hotfixRunningFile
 
   // 热修文件全名与热修文件
-  protected val runningHotfixByFileName: Map<String, HotfixFile>
-    get() = hotfixCommand.runningHotfixByFileName
+  val runningHotfixByFileName: Map<String, HotfixFile>
+    get() = hotfixCommand.runningHotfixByFileName.toMap()
 
   final override fun onEnable() {
     super.onEnable()
@@ -83,6 +83,8 @@ abstract class HotfixKotlinPlugin(
 
   /**
    * 添加文件后缀处理者
+   *
+   * 建议在 init 中调用
    */
   protected fun addSuffixHandler(handler: IHotfixSuffixHandler) {
     hotfixCommand.hotfixTypeHandlerBySuffix[handler.typeSuffix] = handler
