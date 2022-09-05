@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-  val miraiVersion = "2.12.1"
+  val miraiVersion = "2.12.2"
   compileOnly("net.mamoe:mirai-core:$miraiVersion") // mirai-core 的 API
   compileOnly("net.mamoe:mirai-console:$miraiVersion") // 后端
 }
@@ -23,7 +23,7 @@ publishing {
     create<MavenPublication>("maven") {
       pom {
         name.set("mirai-hotfix")
-        description.set("本插件自动生成 mirai-hotfix 所需要的 SourceSet 文件")
+        description.set("用于实现简单的 miria 热修")
         url.set("https://github.com/985892345/mirai-hotfix")
     
         licenses {

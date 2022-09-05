@@ -4,7 +4,7 @@ plugins {
   kotlin("plugin.serialization") version kotlinVersion
 
   id("net.mamoe.mirai-console") version "2.12.1"
-  id("io.github.985892345.mirai-hotfix") version "1.3"// 引入该插件
+  id("io.github.985892345.mirai-hotfix") version "1.4" // 引入该插件
 }
 
 group = "io.github.985892345"
@@ -25,8 +25,6 @@ hotfix {
   createHotfix("hotfixDemo") {
     implementation("com.google.code.gson:gson:2.9.0")
   }
-  
-  // 可以多写几个，但源集之间并不会自动依赖
 }
 
 
