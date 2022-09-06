@@ -34,3 +34,15 @@ pluginBundle {
   vcsUrl = "https://github.com/985892345/mirai-hotfix"
   tags = listOf("kotlin", "mirai", "hotfix")
 }
+
+val buildConfigFile = project.rootDir
+  .resolve("src")
+  .resolve("main")
+  .resolve("java")
+  .resolve("BuildConfig.kt")
+
+buildConfigFile.delete()
+buildConfigFile.createNewFile()
+
+buildConfigFile.writeText("internal val `mirai-hotfix-version` = \"$version\"")
+

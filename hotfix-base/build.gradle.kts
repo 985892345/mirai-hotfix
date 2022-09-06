@@ -8,6 +8,9 @@ plugins {
   signing
 }
 
+group = rootProject.group
+version = rootProject.version
+
 // 把密码写在 secret.properties 中
 val secretPropsFile = rootDir.resolve("secret").resolve("secret.properties")
 if (secretPropsFile.exists()) {
@@ -35,9 +38,9 @@ publishing {
   publications {
     create<MavenPublication>("MiraiHotfix") {
       
-      groupId = rootProject.group.toString()
+      groupId = project.group.toString()
       artifactId = "mirai-hotfix"
-      version = rootProject.version.toString()
+      version = project.version.toString()
       artifact(tasks["javadocJar"])
       artifact(tasks["sourcesJar"])
       from(components["java"])

@@ -28,7 +28,7 @@ internal class HotfixCommand(
   description = "${hotfixCommandName}的热修指令",
 ) {
 
-  val hotfixRootFile = File(MiraiConsole.rootDir, "com/ndhzs/hotfix").apply { mkdirs() }
+  val hotfixRootFile = MiraiConsole.rootDir.resolve("hotfix").apply { mkdirs() }
   val hotfixLoadFile = File(hotfixRootFile, hotfixDirName).apply { mkdirs() }
   val hotfixRunningFile = File(hotfixLoadFile, ".run").apply { mkdirs() }
 

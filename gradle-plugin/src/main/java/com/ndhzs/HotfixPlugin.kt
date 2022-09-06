@@ -1,13 +1,9 @@
 package com.ndhzs
 
 import com.ndhzs.extentions.HotfixConfig
-import com.ndhzs.utils.HotfixDependencyHandlerScope
+import `mirai-hotfix-version`
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.api.tasks.bundling.Jar
-import java.io.File
 
 /**
  * ...
@@ -24,6 +20,9 @@ class HotfixPlugin : Plugin<Project> {
   }
   
   private fun Project.dependMiraiHotfix() {
-    dependencies.add("implementation", "io.github.985892345:mirai-hotfix:1.5.0")
+    dependencies.add(
+      "implementation",
+      "io.github.985892345:mirai-hotfix:${`mirai-hotfix-version`}"
+    )
   }
 }

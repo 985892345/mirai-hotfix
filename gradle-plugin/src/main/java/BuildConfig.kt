@@ -1,0 +1,1 @@
+internal val `mirai-hotfix-version` = "1.5.1"
