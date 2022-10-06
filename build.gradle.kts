@@ -1,5 +1,4 @@
 import java.util.Properties
-import java.io.FileInputStream
 
 plugins {
   val kotlinVersion = "1.7.10"
@@ -10,7 +9,7 @@ plugins {
 }
 
 val properties = Properties().apply {
-  load(FileInputStream(rootDir.resolve("version.properties")))
+  load(rootDir.resolve("version.properties").inputStream())
 }
 
 group = properties.getValue("group")
