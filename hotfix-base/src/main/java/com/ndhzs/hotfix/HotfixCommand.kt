@@ -1,208 +1,139 @@
 package com.ndhzs.hotfix
 
-import com.ndhzs.hotfix.handler.load.HotfixReload
-import com.ndhzs.hotfix.handler.load.HotfixRemove
-import com.ndhzs.hotfix.handler.suffix.IHotfixSuffixHandler
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.CompositeCommand
 import net.mamoe.mirai.console.command.ConsoleCommandSender
-import net.mamoe.mirai.console.rootDir
-import java.io.File
+import net.mamoe.mirai.console.util.ConsoleExperimentalApi
+import java.util.StringJoiner
 
 /**
- * 热修命令
+ * ...
  *
  * @author 985892345 (Guo Xiangrui)
- * @email 2767465918@qq.com
- * @date 2022/4/11 11:13
+ * @date 2022/10/6 14:48
  */
-internal class HotfixCommand(
-  private val hotfixPlugin: HotfixKotlinPlugin,
-  hotfixDirName: String,
-  hotfixCommandName: String,
-  typeHandlers: List<IHotfixSuffixHandler>
+@OptIn(ConsoleExperimentalApi::class)
+class HotfixCommand(
+  private val plugin: HotfixKotlinPlugin
 ) : CompositeCommand(
-  hotfixPlugin, "fix${hotfixCommandName}",
-  description = "${hotfixCommandName}的热修指令",
+  plugin,
+  "fix${plugin.hotfixCommandName}",
+  description = "${plugin.hotfixCommandName}的热修指令"
 ) {
 
-  val hotfixRootFile = MiraiConsole.rootDir.resolve("hotfix").apply { mkdirs() }
-  val hotfixLoadFile = File(hotfixRootFile, hotfixDirName).apply { mkdirs() }
-  val hotfixRunningFile = File(hotfixLoadFile, ".run").apply { mkdirs() }
-
-  val hotfixTypeHandlerBySuffix = mutableMapOf<String, IHotfixSuffixHandler>()
-  val runningHotfixByFileName = mutableMapOf<String, HotfixKotlinPlugin.HotfixFile>()
-  private val logger = hotfixPlugin.logger
-
-  init {
-    typeHandlers.forEach {
-      val typeHandler = hotfixTypeHandlerBySuffix[it.typeSuffix]
-      if (typeHandler != null) {
-        logger.warning("${it.typeSuffix} 后缀已存在处理者：${typeHandler::class.simpleName}，${it::class.simpleName} 添加失败")
-      } else {
-        hotfixTypeHandlerBySuffix[it.typeSuffix] = it
-      }
-    }
-    hotfixPlugin.launch {
-      ConsoleCommandSender.apply {
-        reloadFile(this, emptyArray(), hotfixRunningFile).apply {
-          if (this != null) {
-            logger.info("\n${hotfixPlugin.description.id} 初始化加载文件如下：\n${weaveReloadResult(this)}")
-          } else {
-            logger.info("无初始化热修文件")
-          }
-        }
-      }
-    }
-  }
-
   /**
-   * 重新加载某个热修包，会先卸载旧的热修包（如果有的话）再加载新的热修包
+   * 重新加载某个热修包，会先删除旧的热修包（如果有的话）再加载新的热修包
    *
-   * 命令 /fix... reload keyword1 keyword2 keyword3...
+   * 命令 /fix... reload regex
    *
-   * @param keyword 文件名的关键字，当输入多个时会取并集
+   * @param regex 正则
    */
   @Description("重新加载某个热修包")
   @SubCommand
-  suspend fun CommandSender.reload(vararg keyword: String) {
-    sendMessage(
-      weaveReloadResult(
-        reloadFile(this, keyword)
-      )
-    )
-  }
-
-  private suspend fun reloadFile(
-    commandSender: CommandSender,
-    keyword: Array<out String>,
-    whereFile: File = hotfixLoadFile
-  ): HotfixReload.ReloadState? {
-    return commandSender.run {
-      HotfixReload.run {
-        reloadFiles(
-          hotfixPlugin,
-          findFile(whereFile, keyword),
-          hotfixRunningFile, hotfixTypeHandlerBySuffix, runningHotfixByFileName
-        )?.apply {
-          reloadSuccessList.forEach {
-            runningHotfixByFileName[it.file.name] = it
-          }
-        }
-      }
+  suspend fun CommandSender.reload(@Name("正则") regex: String) {
+    sendResultMessage(
+      "reload:",
+      plugin.controller.reloadHotfix(this, Regex(regex))
+    ) {
+      first.name + "\t" + (second?.message ?: "加载成功")
     }
   }
 
   /**
-   * 移除某个热修包
+   * 删除某个热修包
    *
-   * 命令 /fix... remove keyword1 keyword2 keyword3...
+   * 命令 /fix... remove regex
    *
-   * @param keyword 文件名的关键字，当输入多个时会取并集
+   * @param regex 正则
    */
-  @Description("移除某个热修包")
+  @Description("删除某个热修包")
   @SubCommand
-  suspend fun CommandSender.remove(vararg keyword: String) {
-    sendMessage(
-      weaveRemoveResult(
-        removeFile(this, keyword)
-      )
-    )
+  suspend fun CommandSender.delete(@Name("正则") regex: String) {
+    sendResultMessage(
+      "delete",
+      plugin.controller.deleteHotfix(this, Regex(regex))
+    ) {
+      first.name + "\t" + (second?.message ?: "删除成功")
+    }
   }
 
-  private suspend fun removeFile(
-    commandSender: CommandSender,
-    keyword: Array<out String>,
-  ): HotfixRemove.RemoveState? {
-    return commandSender.run {
-      HotfixRemove.run {
-        removeFiles(findFile(hotfixRunningFile, keyword), runningHotfixByFileName)
-      }
+  /**
+   * 取消某个热修包，卸载但不删除，卸载成功后会移动到未加载的文件夹中
+   *
+   * 命令 /fix... cancel regex
+   *
+   * @param regex 正则
+   */
+  @Description("取消某个热修包")
+  @SubCommand
+  suspend fun CommandSender.cancel(@Name("正则") regex: String) {
+    sendResultMessage(
+      "cancel:",
+      plugin.controller.cancelHotfix(this, Regex(regex))
+    ) {
+      first.name + "\t" + (second?.message ?: "取消成功")
     }
+  }
+
+  /**
+   * 列出全部的热修包
+   *
+   * 命令 /fix... list
+   */
+  @Description("查看加载了哪些热修包")
+  @SubCommand
+  suspend fun CommandSender.list() {
+    list(".+")
   }
 
   /**
    * 查看加载了哪些热修包
    *
-   * 命令 /fix... list keyword
+   * 命令 /fix... list regex
    *
-   * @param keyword 文件名的关键字，当输入多个时会取并集
+   * @param regex 正则
    */
   @Description("查看加载了哪些热修包")
   @SubCommand
-  suspend fun CommandSender.list(vararg keyword: String) {
-    sendMessage(
-      weaveListResult(keyword)
-    )
-  }
-
-  private fun findFile(dirFile: File, must: Array<out String> = emptyArray()): Array<File> {
-    return dirFile.listFiles { _, name ->
-      must.all { name.contains(it) } && name != hotfixRunningFile.name
-    } ?: emptyArray()
-  }
-
-  /**
-   * 编织热修结果的数据为 String
-   */
-  private fun weaveReloadResult(
-    reloadState: HotfixReload.ReloadState?
-  ): String {
-    if (reloadState != null) {
-      return StringBuilder()
-        .weave("加载成功", reloadState.reloadSuccessList.map { it.file }, false)
-        .weave("无法处理", reloadState.noHandlerList)
-        .weave("不能卸载", reloadState.removeState?.unloadFailureList?.map { it.file })
-        .weave("无法卸载", reloadState.removeState?.closeFailureList?.map { it.file })
-        .weave("删除失败", reloadState.removeState?.deleteFailureList?.map { it.file })
-        .weave("读取失败", reloadState.readFailureList)
-        .weave("移动失败", reloadState.moveFailureList)
-        .toString()
+  suspend fun CommandSender.list(@Name("正则") regex: String) {
+    sendResultMessage(
+      "list:",
+      plugin.controller.listHotfix(this, Regex(regex))
+    ) {
+      name
     }
-    return "未找到该文件！"
   }
 
-  private fun weaveRemoveResult(
-    removeState: HotfixRemove.RemoveState?
-  ): String {
-    if (removeState != null) {
-      return StringBuilder()
-        .weave("删除成功", removeState.removeSuccessList.map { it.file }, false)
-        .weave("不能卸载", removeState.unloadFailureList.map { it.file })
-        .weave("无法卸载", removeState.closeFailureList.map { it.file })
-        .weave("删除失败", removeState.deleteFailureList.map { it.file })
-        .toString()
+  private suspend fun <T> CommandSender.sendResultMessage(
+    entryWord: String,
+    result: List<T>,
+    description: T.(index: Int) -> String
+  ) {
+    val joiner = StringJoiner("\n")
+    joiner.add(entryWord)
+    result.forEachIndexed { index, t ->
+      joiner.add("${index + 1}、${description.invoke(t, index)}")
     }
-    return "未找到该文件！"
+    if (result.isEmpty()) {
+      sendMessage("未找到该文件")
+    } else {
+      sendMessage(joiner.toString())
+    }
   }
 
-  private fun weaveListResult(
-    keyword: Array<out String>
-  ): String {
-    val findList = mutableListOf<File>()
-    runningHotfixByFileName.forEach { entry ->
-      if (keyword.all { entry.key.contains(it) }) {
-        findList.add(entry.value.file)
+  init {
+    // 初始化时加载上一次加载了的热修包
+    val result = plugin.controller
+      .reloadHotfix(
+        ConsoleCommandSender,
+        Regex(".+"),
+        plugin.controller.fileController.loadedDir
+      )
+    ConsoleCommandSender.launch {
+      ConsoleCommandSender.sendResultMessage("init:", result) {
+        first.name + "\t" + (second?.message ?: "success")
       }
     }
-    return StringBuilder()
-      .weave("发现以下热修文件", findList, false)
-      .toString()
-  }
-
-  private fun StringBuilder.weave(str: String, list: List<File>?, ignoreEmpty: Boolean = true): StringBuilder {
-    if (list == null || ignoreEmpty && list.isEmpty()) {
-      return this
-    }
-    append(str).append("：").appendLine(list.size)
-    repeat(list.size) {
-      append("${it + 1}、").append(list[it].name)
-      if (it < list.size - 1) {
-        append('\n')
-      }
-    }
-    return this
   }
 }

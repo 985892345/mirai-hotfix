@@ -69,7 +69,10 @@ afterEvaluate {
           name = "mavenCentral" // 点击 publishReleasePublicationToMavenCentralRepository 发布到 mavenCentral
           val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
           val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-          setUrl(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+          val isSnapshot = version.toString().run {
+            endsWith("SNAPSHOT")
+          }
+          setUrl(if (isSnapshot) snapshotsRepoUrl else releasesRepoUrl)
           credentials {
             username = project.properties["mavenCentralUsername"].toString()
             password = project.properties["mavenCentralPassword"].toString()

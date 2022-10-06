@@ -1,4 +1,4 @@
-package com.ndhzs.hotfix.handler.suffix.jar
+package com.ndhzs.hotfix.suffix.jar
 
 /**
  * ...

@@ -1,12 +1,12 @@
 package com.ndhzs.hotfix
 
-import com.ndhzs.hotfix.handler.suffix.IHotfixSuffixHandler
-import com.ndhzs.hotfix.handler.suffix.jar.JarHotfixSuffixHandler
+import com.ndhzs.hotfix.controller.AbstractHotfixController
+import com.ndhzs.hotfix.controller.impl.CommonHotfixController
+import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
-import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -34,36 +34,23 @@ import kotlin.coroutines.EmptyCoroutineContext
  * ```
  *
  * @param hotfixDirName 热修文件的部署目录，会在控制台根目录的 hotfix 下，默认以项目 id 后缀命名
- * @param hotfixCommandName 热修的命令，会以 "fix${hotfixCommandName}" 命名
- * @param typeHandlers 热修文件的类型处理者，默认添加自带的 jar，可以实现 IHotfixHandler 接口自定义自己的热修逻辑
+ * @param hotfixCommandName 热修的命令，默认为项目 id 后缀，会以 "fix${hotfixCommandName}" 命名
  */
 abstract class HotfixKotlinPlugin(
   description: JvmPluginDescription,
   parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
-  hotfixDirName: String = description.id.substringAfterLast("."),
-  hotfixCommandName: String = hotfixDirName,
-  private val typeHandlers: MutableList<IHotfixSuffixHandler> = mutableListOf(JarHotfixSuffixHandler)
+  val hotfixCommandName: String = description.id.substringAfterLast("."),
+  val controller: AbstractHotfixController = CommonHotfixController(
+    loadedDirName = description.id.substringAfterLast("."),
+    notLoadedDirName = ".run"
+  )
 ) : KotlinPlugin(
   description,
   parentCoroutineContext
 ) {
   private val hotfixCommand by lazy {
-    HotfixCommand(this, hotfixDirName, hotfixCommandName, typeHandlers)
+    HotfixCommand(this)
   }
-
-  // 热修根目录
-  val hotfixRootFile: File
-    get() = hotfixCommand.hotfixRootFile
-  // 热修加载目录
-  val hotfixLoadFile: File
-    get() = hotfixCommand.hotfixLoadFile
-  // 热修运行目录
-  val hotfixRunningFile: File
-    get() = hotfixCommand.hotfixRunningFile
-
-  // 热修文件全名与热修文件
-  val runningHotfixByFileName: Map<String, HotfixFile>
-    get() = hotfixCommand.runningHotfixByFileName.toMap()
 
   final override fun onEnable() {
     super.onEnable()
@@ -86,12 +73,7 @@ abstract class HotfixKotlinPlugin(
    *
    * 建议在 init 中调用
    */
-  protected fun addSuffixHandler(handler: IHotfixSuffixHandler) {
-    typeHandlers.add(handler)
+  protected fun addSuffixHandler(handler: AbstractHotfixSuffixHandler) {
+    controller.addSuffixHandler(handler)
   }
-
-  class HotfixFile(
-    val file: File,
-    val hotfixSuffixHandler: IHotfixSuffixHandler
-  )
 }

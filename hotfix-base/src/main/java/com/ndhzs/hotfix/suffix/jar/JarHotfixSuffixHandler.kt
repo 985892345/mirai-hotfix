@@ -1,6 +1,6 @@
-package com.ndhzs.hotfix.handler.suffix.jar
+package com.ndhzs.hotfix.suffix.jar
 
-import com.ndhzs.hotfix.handler.suffix.IHotfixSuffixHandler
+import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -16,10 +16,7 @@ import java.util.jar.JarFile
  *
  * **NOTE：** 为了快速读取，启动类规定只能放在 jar 根路径下
  */
-object JarHotfixSuffixHandler : IHotfixSuffixHandler {
-
-  override val typeSuffix: String
-    get() = "jar"
+object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
 
   internal val jarByFileName = mutableMapOf<String, Jar>()
 

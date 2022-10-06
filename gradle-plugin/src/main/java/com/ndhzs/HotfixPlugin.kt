@@ -20,9 +20,13 @@ class HotfixPlugin : Plugin<Project> {
   }
   
   private fun Project.dependMiraiHotfix() {
+    val version = if (`mirai-hotfix-version`.endsWith("SNAPSHOT")) {
+//      "alpha"
+      `mirai-hotfix-version`
+    } else `mirai-hotfix-version`
     dependencies.add(
       "implementation",
-      "io.github.985892345:mirai-hotfix:${`mirai-hotfix-version`}"
+      "io.github.985892345:mirai-hotfix:${version}"
     )
   }
 }

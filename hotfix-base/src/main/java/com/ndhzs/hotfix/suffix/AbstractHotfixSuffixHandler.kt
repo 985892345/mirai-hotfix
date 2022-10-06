@@ -1,4 +1,4 @@
-package com.ndhzs.hotfix.handler.suffix
+package com.ndhzs.hotfix.suffix
 
 import com.ndhzs.hotfix.HotfixKotlinPlugin
 import net.mamoe.mirai.console.command.CommandSender
@@ -10,14 +10,11 @@ import java.io.File
  * @email 2767465918@qq.com
  * @date 2022/4/10 14:41
  */
-interface IHotfixSuffixHandler {
 
-  /**
-   * 处理哪种文件的后缀
-   *
-   * 注意：不包含 “.”，比如：.jar 后缀直接写 jar 即可
-   */
-  val typeSuffix: String
+/**
+ * @param typeSuffix 处理哪种文件的后缀。注意：不包含 “.”，比如：.jar 后缀直接写 jar 即可
+ */
+abstract class AbstractHotfixSuffixHandler(val typeSuffix: String) {
 
   /**
    * 加载此文件
@@ -29,7 +26,7 @@ interface IHotfixSuffixHandler {
    * @param file File 为 [HotfixKotlinPlugin.hotfixRootFile] 下具体的某个文件，因为在加载前会先移动到 .run 文件夹下，如果加载失败，会移动回去
    */
   @Throws(ClassNotFoundException::class)
-  fun CommandSender.onFixLoad(file: File, pluginClassLoader: ClassLoader)
+  abstract fun CommandSender.onFixLoad(file: File, pluginClassLoader: ClassLoader)
 
   /**
    * 卸载此文件
@@ -41,5 +38,5 @@ interface IHotfixSuffixHandler {
    * @param file File 为 [HotfixKotlinPlugin.hotfixRootFile] 下具体的某个文件，因为在加载前会先移动到 .run 文件夹下
    * @return 返回 true，表示能够卸载；返回 false，表示不允许卸载
    */
-  fun CommandSender.onFixUnload(file: File): Boolean
+  abstract fun CommandSender.onFixUnload(file: File): Boolean
 }

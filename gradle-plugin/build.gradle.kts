@@ -1,7 +1,7 @@
 import java.util.Properties
 
 plugins {
-  kotlin("jvm") version "1.7.10"
+  kotlin("jvm") version "1.7.20"
   id("com.gradle.plugin-publish") version "1.0.0-rc-3" // https://plugins.gradle.org/docs/publish-plugin
 }
 
@@ -34,14 +34,44 @@ pluginBundle {
   tags = listOf("kotlin", "mirai", "hotfix")
 }
 
-val buildConfigFile = project.rootDir
-  .resolve("src")
-  .resolve("main")
-  .resolve("java")
-  .resolve("BuildConfig.kt")
+tasks.register("createBuildConfig") {
+  dependsOn("publishPlugins")
+  doFirst {
+    val versionOtherText = "internal val `mirai-hotfix-version` = "
 
-buildConfigFile.delete()
-buildConfigFile.createNewFile()
+    val buildConfigFile = project.rootDir
+      .resolve("src")
+      .resolve("main")
+      .resolve("java")
+      .resolve("BuildConfig.kt")
 
-buildConfigFile.writeText("internal val `mirai-hotfix-version` = \"$version\"")
+    if (!version.toString().endsWith("SNAPSHOT")) {
+      if (buildConfigFile.exists()) {
+        buildConfigFile.writer()
+      } else {
+        buildConfigFile.createNewFile()
+        buildConfigFile.writeText("internal val `mirai-hotfix-version` = \"$version\"")
+      }
+    } else {
+
+    }
+
+    val text = buildConfigFile.readText()
+    val oldVersion = Regex("(?<=$versionOtherText\")[^\"]+").find(text)?.value
+    if (oldVersion != null) {
+      val suffix = oldVersion.substringAfterLast("-")
+      if (suffix != oldVersion) {
+        var alphaVersion = Regex("(?<=alpha)[0-9]+").find(suffix)?.value
+        if (alphaVersion == null) {
+          alphaVersion = "1"
+        } else {
+          alphaVersion = (alphaVersion.toInt() + 1).toString()
+        }
+
+      } else {
+
+      }
+    }
+  }
+}
 
