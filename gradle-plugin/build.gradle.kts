@@ -10,7 +10,42 @@ val properties = Properties().apply {
 }
 
 group = properties.getValue("group")
-version = properties.getValue("version")
+if (gradle.parent!!.startParameter.taskNames.contains(":gradle-plugin:publishPlugins")) {
+  val hotfixVersion = properties.getValue("version").toString()
+  val oldVersionFile = rootDir.resolve("oldVersion.txt")
+  // 因为 gradle 不允许发布 SNAPSHOT 结尾的插件，所以只能装换为 alpha 版本
+  version = if (hotfixVersion.endsWith("SNAPSHOT")) {
+    val oldVersion = oldVersionFile.readText()
+    val oldVersionNum = Regex("[0-9]+.[0-9]+.[0-9]").find(oldVersion)?.value
+    val nowVersionNum = Regex("[0-9]+.[0-9]+.[0-9]").find(hotfixVersion)?.value
+    if (oldVersionNum != nowVersionNum) {
+      hotfixVersion.replace("SNAPSHOT", "alpha1")
+    } else {
+      val alphaVersionNum = Regex("(?<=alpha)[1-9][0-9]*").find(oldVersion)?.value
+      if (alphaVersionNum == null) {
+        hotfixVersion.replace("SNAPSHOT", "alpha1")
+      } else {
+        val newAlphaVersionNum = (alphaVersionNum.toInt() + 1).toString()
+        hotfixVersion.replace("SNAPSHOT", "alpha${newAlphaVersionNum}")
+      }
+    }
+  } else hotfixVersion
+  oldVersionFile.writeText(
+    "// 用于记录上一次发布时的版本号，因为 gradle 不允许发布 SNAPSHOT 结尾的插件，所以只能装换为 alpha 版本，然后每次发布自动加 1\n"
+      + version.toString()
+  )
+  
+  // 写入 mirai-hotfix 的版本号
+  project.rootDir
+    .resolve("src")
+    .resolve("main")
+    .resolve("java")
+    .resolve("HotfixVersion.kt")
+    .apply {
+      createNewFile()
+      writeText("internal val `hotfix-version` = \"${hotfixVersion}\"")
+    }
+}
 
 repositories {
   maven("https://maven.aliyun.com/repository/public")
@@ -33,45 +68,3 @@ pluginBundle {
   vcsUrl = "https://github.com/985892345/mirai-hotfix"
   tags = listOf("kotlin", "mirai", "hotfix")
 }
-
-tasks.register("createBuildConfig") {
-  dependsOn("publishPlugins")
-  doFirst {
-    val versionOtherText = "internal val `mirai-hotfix-version` = "
-
-    val buildConfigFile = project.rootDir
-      .resolve("src")
-      .resolve("main")
-      .resolve("java")
-      .resolve("BuildConfig.kt")
-
-    if (!version.toString().endsWith("SNAPSHOT")) {
-      if (buildConfigFile.exists()) {
-        buildConfigFile.writer()
-      } else {
-        buildConfigFile.createNewFile()
-        buildConfigFile.writeText("internal val `mirai-hotfix-version` = \"$version\"")
-      }
-    } else {
-
-    }
-
-    val text = buildConfigFile.readText()
-    val oldVersion = Regex("(?<=$versionOtherText\")[^\"]+").find(text)?.value
-    if (oldVersion != null) {
-      val suffix = oldVersion.substringAfterLast("-")
-      if (suffix != oldVersion) {
-        var alphaVersion = Regex("(?<=alpha)[0-9]+").find(suffix)?.value
-        if (alphaVersion == null) {
-          alphaVersion = "1"
-        } else {
-          alphaVersion = (alphaVersion.toInt() + 1).toString()
-        }
-
-      } else {
-
-      }
-    }
-  }
-}
-

@@ -1,8 +1,8 @@
 package com.ndhzs
 
-import com.ndhzs.hotfix.handler.suffix.jar.JarEntrance
-import com.ndhzs.hotfix.handler.suffix.jar.JarHotfixUser
-import com.ndhzs.hotfix.handler.suffix.jar.getEntrance
+import com.ndhzs.hotfix.suffix.jar.JarEntrance
+import com.ndhzs.hotfix.suffix.jar.JarHotfixUser
+import com.ndhzs.hotfix.suffix.jar.getEntrance
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.SimpleCommand
 

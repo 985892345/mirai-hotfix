@@ -1,6 +1,6 @@
 package com.ndhzs
 
-import com.ndhzs.hotfix.handler.suffix.jar.JarEntrance
+import com.ndhzs.hotfix.suffix.jar.JarEntrance
 
 /**
  * 定义接口用于分离逻辑代码

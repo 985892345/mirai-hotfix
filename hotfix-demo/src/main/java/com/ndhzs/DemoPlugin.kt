@@ -19,7 +19,6 @@ object DemoPlugin : HotfixKotlinPlugin(
   ) {
     author("985892345")
   },
-  hotfixDirName = "demo", // 自定义热修的部署文件，部署文件在 /控制台目录/hotfix/demo 下
   hotfixCommandName = "demo" // 自定义热修命令，设置后热修名字为：fixdemo
 ) {
   override fun onHotfixDisable() {
