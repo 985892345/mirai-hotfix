@@ -21,3 +21,5 @@ rootProject.name = "mirai-hotfix"
 include("hotfix-base")
 includeBuild("gradle-plugin")
 include("hotfix-demo")
+include("hotfix")
+include("hotfix-chat")
