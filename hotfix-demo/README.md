@@ -1,7 +1,78 @@
 # 热修示例 demo
- 由于热修一般需要与其他代码进行交互，所以这里提供了两种使用方式：
+ 此 demo 采用新增源集来使用热修，接入的逻辑很简单，主要分为一下步骤：
 
-- [新建 SourceSet 来依赖其他代码](../demo/demo-sourceSet)
-- [采用子模块来依赖其他代码](../demo/demo-modules)
+## 1、接入插件
+```kotlin
+plugins {
+  id("io.github.985892345.mirai-hotfix") version "xxx" // 版本号请查看标签
+}
+```
 
- 为了配合 Mirai 官方插件生成的项目，我更推荐采用第一种方式，只需要在源代码的基础上修改少量代码即可接入热修
+### 2、新增源集
+在 `build.gradle.kts` 中书写如下代码：
+```kotlin
+hotfix {
+  // 比如新增一个名字叫 connect 的源集
+  createHotfix("connect")
+}
+
+// 如果你需要给 connect 源集单独使用依赖，可以采用下面这种写法
+hotfix {
+  // 这里用于设置自定义源集并引入该源集单独使用的依赖
+  createHotfix("connect") {
+    implementation("com.google.code.gson:gson:2.9.0")
+  }
+}
+```
+注意：新增源集会自动依赖 `main` 源集，不必重复添加依赖
+
+### 3、编写接口
+你需要定义接口来分离逻辑代码，然后将逻辑代码写在 `connect` 源集中  
+具体方式如下：
+```kotlin
+// 在 main 源集中定义一个接口，必须实现 JarEntrance 接口
+interface IConnect : JarEntrance {
+  fun get(): String
+}
+
+// 在 connect 源集中 java 根目录下实现该接口
+class ConnectImpl : IConnect {
+  
+  override fun get(): String {
+    return "123"
+  }
+  
+  override fun CommandSender.onFixLoad() {}
+  
+  override fun CommandSender.onFixUnload(): Boolean = true
+}
+```
+
+### 4、打包源集
+新增 `connect` 源集后会同时增加 gradle 打包任务，会输出 jar 包到 build/libs 下
+```
+./gradlew hotfix-connect
+```
+
+### 5、进行热修
+上传到你服务器的 Mirai控制台目录/hotfix/id后缀 中
+```
+- /bots
+- /config
+- /data
+- /hotfix
+--- /demo-sourceSet           这是 hotfixDirName，你需要把文件部署在该目录下，再调用热修命令
+------ /.run                  这是热修成功并且正在运行的文件，一般不需要进入查看
+------ hotfix-connect.jar     这是部署后即将进行热修的文件，使用 fix... reload hotfix-connect.jar 命令进行热修
+- /plugins
+```
+
+然后在控制台中输入以下指令进行热修
+```
+fix... reload hotfix-connect.jar 
+// 该三个点取决于你的 id 后缀
+```
+
+之后计划开发直接丢群聊文件进行热修的工具
+
+

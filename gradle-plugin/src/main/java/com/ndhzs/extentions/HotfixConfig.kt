@@ -53,10 +53,10 @@ abstract class HotfixConfig(private val project: Project) : ExtensionAware {
      * 位置在 idea  gradle 侧边栏 Tasks/hotfix/xxx 中
      * 打好的包位置在 build/libs 下
      */
-    tasks.register(sourceSetName, Jar::class.java) {
+    tasks.register("hotfix-$sourceSetName", Jar::class.java) {
       it.group = "hotfix"
       it.exclude("META-INF/**")
-      it.archiveFileName.set("$sourceSetName.jar")
+      it.archiveFileName.set("hotfix-$sourceSetName.jar")
       it.from(sourceSets.named(sourceSetName).get().output)
       // 增加 runtimeClasspath
       it.from(sourceSets.named(sourceSetName).get().runtimeClasspath.filter { file ->

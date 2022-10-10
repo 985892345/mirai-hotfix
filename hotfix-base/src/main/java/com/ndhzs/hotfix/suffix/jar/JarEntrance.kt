@@ -7,8 +7,7 @@ import net.mamoe.mirai.console.command.ConsoleCommandSender
  * 作为 jar 热修文件中启动类的接口
  *
  * 有如下规则需要注意：
- * - 实现类必须放在 jar 包根路径下
- * - 实现类的文件建议只有实现类一个 class
+ * - 实现类必须放在 jar 包根路径下，即代码必须放在 src/源集/java 下
  */
 interface JarEntrance {
   /**

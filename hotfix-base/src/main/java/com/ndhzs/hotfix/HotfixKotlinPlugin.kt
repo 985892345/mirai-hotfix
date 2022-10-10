@@ -27,13 +27,12 @@ import kotlin.coroutines.EmptyCoroutineContext
  * - /config
  * - /data
  * - /hotfix
- * --- /hotfix-demo-plugin       这是 hotfixDirName，你需要把文件部署在该目录下，再调用热修命令
- * ------ /.run                  这是热修成功正在运行的文件
- * ------ hotfix-demo-2.0.jar    这是部署后即将进行热修的文件，使用 fix... reload hotfix-demo-2.0.jar 命令进行热修
+ * --- /demo-sourceSet           这是 hotfixDirName，你需要把文件部署在该目录下，再调用热修命令
+ * ------ /.run                  这是热修成功并且正在运行的文件，一般不需要进入查看
+ * ------ hotfix-connect.jar     这是部署后即将进行热修的文件，使用 fix... reload hotfix-connect.jar 命令进行热修
  * - /plugins
  * ```
  *
- * @param hotfixDirName 热修文件的部署目录，会在控制台根目录的 hotfix 下，默认以项目 id 后缀命名
  * @param hotfixCommandName 热修的命令，默认为项目 id 后缀，会以 "fix${hotfixCommandName}" 命名
  */
 abstract class HotfixKotlinPlugin(
