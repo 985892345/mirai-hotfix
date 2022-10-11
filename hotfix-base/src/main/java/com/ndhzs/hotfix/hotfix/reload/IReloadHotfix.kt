@@ -1,5 +1,7 @@
 package com.ndhzs.hotfix.hotfix.reload
 
+import com.ndhzs.hotfix.HotfixKotlinPlugin
+import com.ndhzs.hotfix.hotfix.delete.IDeleteHotfix
 import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
 import net.mamoe.mirai.console.command.CommandSender
 import java.io.File
@@ -18,8 +20,8 @@ interface IReloadHotfix {
    * @param loadedDir 存放已经加载文件的文件夹
    * @return 返回加载后的文件，如果返回 null 则说明加载失败
    */
-  fun reload(
-    sender: CommandSender,
+  suspend fun CommandSender.reload(
+    plugin: HotfixKotlinPlugin,
     notLoadedFile: File,
     loadedDir: File,
     handler: AbstractHotfixSuffixHandler

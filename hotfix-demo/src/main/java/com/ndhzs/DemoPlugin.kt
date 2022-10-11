@@ -21,13 +21,13 @@ object DemoPlugin : HotfixKotlinPlugin(
   },
   hotfixCommandName = "demo" // 自定义热修命令，设置后热修名字为：fixdemo
 ) {
-  override fun onHotfixDisable() {
-    super.onHotfixDisable()
+  override fun onHotfixEnable() {
+    super.onHotfixEnable()
     DemoCommand.register()
   }
   
-  override fun onHotfixEnable() {
-    super.onHotfixEnable()
+  override fun onHotfixDisable() {
+    super.onHotfixDisable()
     DemoCommand.unregister()
   }
 }

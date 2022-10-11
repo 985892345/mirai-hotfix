@@ -5,6 +5,6 @@ plugins {
 }
 
 publish {
-  projectArtifact = "mirai-hotfix-base"
-  projectDescription = "基于 mirai-console，用于实现简单的逻辑代码热修"
+  artifactId = "mirai-hotfix"
+  description = "基于 mirai-console，用于实现简单的逻辑代码热修"
 }

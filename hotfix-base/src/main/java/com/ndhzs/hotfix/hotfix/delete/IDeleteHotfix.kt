@@ -1,5 +1,6 @@
 package com.ndhzs.hotfix.hotfix.delete
 
+import com.ndhzs.hotfix.HotfixKotlinPlugin
 import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
 import net.mamoe.mirai.console.command.CommandSender
 import java.io.File
@@ -17,8 +18,8 @@ interface IDeleteHotfix {
    * @param loadedFile 已经加载的文件
    * @return 失败时返回异常
    */
-  fun delete(
-    sender: CommandSender,
+  suspend fun CommandSender.delete(
+    plugin: HotfixKotlinPlugin,
     loadedFile: File,
     handler: AbstractHotfixSuffixHandler
   ) : Exception?

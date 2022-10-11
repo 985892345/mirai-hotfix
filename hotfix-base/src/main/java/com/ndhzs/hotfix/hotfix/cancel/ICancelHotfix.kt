@@ -1,5 +1,6 @@
 package com.ndhzs.hotfix.hotfix.cancel
 
+import com.ndhzs.hotfix.HotfixKotlinPlugin
 import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
 import net.mamoe.mirai.console.command.CommandSender
 import java.io.File
@@ -17,8 +18,8 @@ interface ICancelHotfix {
    * @param loadedFile 已经加载的文件
    * @param notLoadedDir 存放未加载文件的文件夹
    */
-  fun cancel(
-    sender: CommandSender,
+  suspend fun CommandSender.cancel(
+    plugin: HotfixKotlinPlugin,
     loadedFile: File,
     notLoadedDir: File,
     handler: AbstractHotfixSuffixHandler

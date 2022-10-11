@@ -1,8 +1,8 @@
 package com.ndhzs.hotfix.suffix.jar
 
+import com.ndhzs.hotfix.HotfixKotlinPlugin
 import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.console.command.CommandSender
 import java.io.File
@@ -20,39 +20,58 @@ object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
 
   internal val jarByFileName = mutableMapOf<String, Jar>()
 
-  override fun CommandSender.onFixLoad(file: File, pluginClassLoader: ClassLoader) {
-    launch {
-      val classLoader = URLClassLoader(arrayOf(file.toURI().toURL()), pluginClassLoader)
-      val jarFile = withContext(Dispatchers.IO) { JarFile(file) }
-      val entries = jarFile.entries()
-      while (entries.hasMoreElements()) {
-        val element = entries.nextElement()
-        // 只允许启动类在根目录下
-        if (!element.name.contains("/")) {
-          val className = element.name
-          // 排除掉 Kt.class 结尾、包含 $ 符号的类
-          if (className.endsWith(".class")
-            && !className.endsWith("Kt.class")
-            && !className.contains("$")
-          ) {
-            val clazz = classLoader.loadClass(className.substringBeforeLast("."))
-            if (JarEntrance::class.java.isAssignableFrom(clazz)) {
-              val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
-              entrance.apply { onFixLoad() }
-              jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
-            }
+  override suspend fun CommandSender.onFixLoad(plugin: HotfixKotlinPlugin, file: File) {
+    val classLoader = URLClassLoader(arrayOf(file.toURI().toURL()), plugin.javaClass.classLoader)
+    val jarFile = withContext(Dispatchers.IO) { JarFile(file) }
+    val entries = jarFile.entries()
+    while (entries.hasMoreElements()) {
+      val element = entries.nextElement()
+      // 只允许启动类在根目录下
+      if (!element.name.contains("/")) {
+        val className = element.name
+        // 排除掉 Kt.class 结尾、包含 $ 符号的类
+        if (className.endsWith(".class")
+          && !className.endsWith("Kt.class")
+          && !className.contains("$")
+        ) {
+          val clazz = classLoader.loadClass(className.substringBeforeLast("."))
+          if (JarEntrance::class.java.isAssignableFrom(clazz)) {
+            val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
+            entrance.apply { onFixLoad(plugin) }
+            jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
           }
         }
       }
     }
   }
 
-  override fun CommandSender.onFixUnload(file: File): Boolean {
-    jarByFileName[file.name]?.apply { unload(this@onFixUnload) }
+  override suspend fun CommandSender.onFixUnload(plugin: HotfixKotlinPlugin, file: File): Boolean {
+    jarByFileName[file.name]?.apply { unload(plugin, this@onFixUnload) }
     jarByFileName.remove(file.name)
     return true
   }
-
+  
+  override suspend fun onEnable(plugin: HotfixKotlinPlugin, file: File?) {
+    if (file == null) {
+      jarByFileName.forEach {
+        it.value.entrance.onEnable(plugin)
+      }
+    } else {
+      jarByFileName[file.name]?.entrance?.onEnable(plugin)
+    }
+  }
+  
+  override suspend fun onDisable(plugin: HotfixKotlinPlugin, file: File?) {
+    if (file == null) {
+      jarByFileName.forEach {
+        it.value.entrance.onDisable(plugin)
+      }
+    } else {
+      jarByFileName[file.name]?.entrance?.onDisable(plugin)
+    }
+  }
+  
+  
   class Jar(
     val file: File,
     val entrance: JarEntrance,
@@ -64,10 +83,12 @@ object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
      *
      * **NOTE:** 这里只是移去了引用，但必须要调用 System.gc() 用于彻底删除引用，这样本地文件才可以被覆盖
      */
-    fun unload(sender: CommandSender): Boolean {
+    suspend fun unload(plugin: HotfixKotlinPlugin, sender: CommandSender): Boolean {
       if (hotfixUsers.all { it.onRemoveEntrance(entrance) }) {
-        entrance.apply { sender.onFixUnload() }
-        classLoader.close() // 关闭对资源的读取
+        entrance.apply { sender.onFixUnload(plugin) }
+        withContext(Dispatchers.IO) {
+          classLoader.close() // 关闭对资源的读取
+        }
         return true
       }
       return false

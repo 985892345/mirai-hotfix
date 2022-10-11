@@ -8,6 +8,11 @@ import java.io.File
  * @author 985892345 (Guo Xiangrui)
  * @date 2022/10/6 11:10
  */
+
+/**
+ * @param loadedDir 热修运行文件地址
+ * @param notLoadedDir 热修加载文件地址
+ */
 class HotfixFileController(
   val loadedDir: File,
   val notLoadedDir: File
@@ -40,7 +45,7 @@ class HotfixFileController(
       }
       val children = dir.listFiles()?.toList() ?: emptyList()
       return children.filter {
-        it.name.matches(regex)
+        it.name.matches(regex) && it.isFile && !it.isDirectory
       }
     }
   }

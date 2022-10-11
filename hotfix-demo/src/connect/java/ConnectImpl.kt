@@ -1,5 +1,6 @@
 import com.google.gson.Gson
 import com.ndhzs.IConnect
+import com.ndhzs.hotfix.HotfixKotlinPlugin
 import net.mamoe.mirai.console.command.CommandSender
 
 /**
@@ -16,14 +17,14 @@ class ConnectImpl : IConnect {
 
   override fun get(): String {
 //    return "123"
-//    return "abc"
-    return gson.toString()
+    return "abc"
+//    return gson.toString()
+  }
+  
+  override suspend fun CommandSender.onFixLoad(plugin: HotfixKotlinPlugin) {
   }
 
-  override fun CommandSender.onFixLoad() {
-  }
-
-  override fun CommandSender.onFixUnload(): Boolean {
+  override suspend fun CommandSender.onFixUnload(plugin: HotfixKotlinPlugin): Boolean {
     return true
   }
 }

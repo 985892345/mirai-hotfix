@@ -3,6 +3,7 @@ package com.ndhzs.hotfix
 import com.ndhzs.hotfix.controller.AbstractHotfixController
 import com.ndhzs.hotfix.controller.impl.CommonHotfixController
 import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
@@ -40,20 +41,23 @@ abstract class HotfixKotlinPlugin(
   parentCoroutineContext: CoroutineContext = EmptyCoroutineContext,
   val hotfixCommandName: String = description.id.substringAfterLast("."),
   val controller: AbstractHotfixController = CommonHotfixController(
-    loadedDirName = description.id.substringAfterLast("."),
-    notLoadedDirName = ".run"
+    description.id.substringAfterLast("."),
+    loadedDir = { resolve(".run") },
+    notLoadedDir = { this }
   )
 ) : KotlinPlugin(
   description,
   parentCoroutineContext
 ) {
-  private val hotfixCommand by lazy {
+  
+  val hotfixCommand by lazy {
     HotfixCommand(this)
   }
 
   final override fun onEnable() {
     super.onEnable()
     hotfixCommand.register()
+    launch { controller.hotfixSuffixHandlers.forEach { it.onEnable(this@HotfixKotlinPlugin, null) } }
     onHotfixEnable()
   }
 
@@ -62,6 +66,7 @@ abstract class HotfixKotlinPlugin(
   final override fun onDisable() {
     super.onDisable()
     hotfixCommand.unregister()
+    launch { controller.hotfixSuffixHandlers.forEach { it.onDisable(this@HotfixKotlinPlugin, null) } }
     onHotfixDisable()
   }
 

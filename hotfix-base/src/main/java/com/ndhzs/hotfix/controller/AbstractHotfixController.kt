@@ -15,13 +15,13 @@ abstract class AbstractHotfixController(
   val fileController: HotfixFileController
 ) : IHotfixController {
 
-  private val mHotfixSuffixHandlers = arrayListOf<AbstractHotfixSuffixHandler>()
+  val hotfixSuffixHandlers = arrayListOf<AbstractHotfixSuffixHandler>()
 
   /**
    * 添加文件后缀处理器
    */
   fun addSuffixHandler(handler: AbstractHotfixSuffixHandler) {
-    mHotfixSuffixHandlers.add(handler)
+    hotfixSuffixHandlers.add(handler)
   }
 
   /**
@@ -29,7 +29,7 @@ abstract class AbstractHotfixController(
    */
   fun findSuffixHandler(file: File): AbstractHotfixSuffixHandler? {
     val suffix = file.name.substringAfterLast(".")
-    mHotfixSuffixHandlers.forEach {
+    hotfixSuffixHandlers.forEach {
       if (it.typeSuffix == suffix) {
         return it
       }

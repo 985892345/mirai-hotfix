@@ -5,9 +5,14 @@ plugins {
   id("io.github.985892345.mirai-hotfix") // 这里我直接用的模块内的插件，你需要单独写上版本号
 }
 
+configurations.all {
+  resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
+}
+
 // 这里给全部源集设置依赖
 dependencies {
   // 使用 gradle 插件后已经自动依赖了 mirai-hotfix
+  shadowLink("io.github.985892345:mirai-hotfix")
 }
 
 hotfix {
