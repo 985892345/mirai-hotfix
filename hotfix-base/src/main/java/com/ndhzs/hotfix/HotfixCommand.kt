@@ -6,11 +6,6 @@ import net.mamoe.mirai.console.command.CompositeCommand
 import net.mamoe.mirai.console.command.ConsoleCommandSender
 import net.mamoe.mirai.console.plugin.id
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
-import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.event.events.GroupMessageEvent
-import net.mamoe.mirai.event.globalEventChannel
-import net.mamoe.mirai.message.data.FileMessage
-import net.mamoe.mirai.message.data.firstIsInstanceOrNull
 import java.util.StringJoiner
 
 /**
@@ -42,7 +37,7 @@ class HotfixCommand(
       "reload:",
       plugin.controller.run { reloadHotfix(plugin, Regex(regex)) }
     ) {
-      first.name + "   " + (second?.message ?: "success")
+      first.name + "\t   " + (second?.message ?: "success")
     }
   }
   
@@ -60,7 +55,7 @@ class HotfixCommand(
       "delete:",
       plugin.controller.run { deleteHotfix(plugin, Regex(regex)) }
     ) {
-      first.name + "   " + (second?.message ?: "success")
+      first.name + "\t   " + (second?.message ?: "success")
     }
   }
   
@@ -78,7 +73,7 @@ class HotfixCommand(
       "cancel:",
       plugin.controller.run { cancelHotfix(plugin, Regex(regex)) }
     ) {
-      first.name + "   " + (second?.message ?: "success")
+      first.name + "\t   " + (second?.message ?: "success")
     }
   }
   
@@ -111,7 +106,7 @@ class HotfixCommand(
     plugin.controller.apply {
       chatHotfix(plugin, isWithdrawn) {
         sendResultMessage("chat reload:", it) {
-          first.name + "   " + (second?.message ?: "success")
+          first.name + "\t   " + (second?.message ?: "success")
         }
       }
     }
@@ -151,7 +146,7 @@ class HotfixCommand(
           )
         }
         sendResultMessage("init:", result) {
-          first.name + "   " + (second?.message ?: "success")
+          first.name + "\t   " + (second?.message ?: "success")
         }
       }
     }

@@ -6,6 +6,12 @@
 plugins {
   id("io.github.985892345.mirai-hotfix") version "xxx" // 版本号请查看标签
 }
+
+// 如果你使用的 2.11 及版本以上的 Mirai Console Gradle 打包插件，请添加上如下代码
+// 原因：https://github.com/mamoe/mirai/tree/dev/mirai-console/tools/gradle-plugin
+dependencies {
+  shadowLink("io.github.985892345:mirai-hotfix")
+}
 ```
 
 ### 2、新增源集
