@@ -1,9 +1,9 @@
 package com.ndhzs.hotfix.suffix.jar
 
+import com.ndhzs.hotfix.comand.HotfixCommandSender
 import com.ndhzs.hotfix.HotfixKotlinPlugin
 import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import net.mamoe.mirai.console.command.CommandSender
 import java.io.File
 import java.net.URLClassLoader
@@ -37,6 +37,9 @@ object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
           val clazz = classLoader.loadClass(className.substringBeforeLast("."))
           if (JarEntrance::class.java.isAssignableFrom(clazz)) {
             val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
+            val supervisorJob = plugin.launch {
+            
+            }
             entrance.apply { onFixLoad(plugin) }
             jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
           }
@@ -76,14 +79,15 @@ object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
     val file: File,
     val entrance: JarEntrance,
     val classLoader: URLClassLoader,
-    val hotfixUsers: MutableList<JarHotfixUser>
+    val hotfixUsers: MutableList<JarHotfixUser>,
+    val supervisorJob: Job
   ) {
     /**
      * 删除 jar
      *
      * **NOTE:** 这里只是移去了引用，但必须要调用 System.gc() 用于彻底删除引用，这样本地文件才可以被覆盖
      */
-    suspend fun unload(plugin: HotfixKotlinPlugin, sender: CommandSender): Boolean {
+    suspend fun unload(plugin: HotfixKotlinPlugin, sender: HotfixCommandSender): Boolean {
       if (hotfixUsers.all { it.onRemoveEntrance(entrance) }) {
         entrance.apply { sender.onFixUnload(plugin) }
         withContext(Dispatchers.IO) {

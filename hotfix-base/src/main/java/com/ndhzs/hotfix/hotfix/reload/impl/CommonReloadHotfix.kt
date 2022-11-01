@@ -74,7 +74,7 @@ open class CommonReloadHotfix : IReloadHotfix {
   ): Exception? {
     if (!loadedFile.exists()) return null
     return try {
-      if (suffix.run { onFixUnloadInternal(plugin, loadedFile) }) {
+      if (suffix.onFixUnloadInternal(this, plugin, loadedFile)) {
         System.gc()
         delay(20)
         withContext(Dispatchers.IO) {
@@ -93,9 +93,7 @@ open class CommonReloadHotfix : IReloadHotfix {
     suffix: AbstractHotfixSuffixHandler
   ): Exception? {
     return try {
-      suffix.apply {
-        onFixLoadInternal(plugin, file)
-      }
+      suffix.onFixLoadInternal(this, plugin, file)
       null
     } catch (e: Exception) {
       e

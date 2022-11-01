@@ -1,6 +1,7 @@
 package com.ndhzs.hotfix.suffix
 
 import com.ndhzs.hotfix.HotfixKotlinPlugin
+import com.ndhzs.hotfix.comand.HotfixCommandSender
 import net.mamoe.mirai.console.command.CommandSender
 import java.io.File
 
@@ -16,18 +17,18 @@ import java.io.File
  */
 abstract class AbstractHotfixSuffixHandler(val typeSuffix: String) {
   
-  internal suspend fun CommandSender.onFixLoadInternal(plugin: HotfixKotlinPlugin, file: File) {
-    onFixLoad(plugin, file)
+  internal suspend fun onFixLoadInternal(sender: CommandSender, plugin: HotfixKotlinPlugin, file: File) {
+    sender.onFixLoad(plugin, file)
     if (plugin.isEnabled) {
       onEnable(plugin, file)
     }
   }
   
-  internal suspend fun CommandSender.onFixUnloadInternal(plugin: HotfixKotlinPlugin, file: File): Boolean {
+  internal suspend fun onFixUnloadInternal(sender: CommandSender, plugin: HotfixKotlinPlugin, file: File): Boolean {
     if (plugin.isEnabled) {
       onDisable(plugin, file)
     }
-    return onFixUnload(plugin, file)
+    return sender.onFixUnload(plugin, file)
   }
 
   /**
