@@ -1,1 +1,1 @@
-internal val `hotfix-version` = "2.1.0-SNAPSHOT"
+internal val `hotfix-version` = "2.1.0"

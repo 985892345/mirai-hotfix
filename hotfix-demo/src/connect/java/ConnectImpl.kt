@@ -2,6 +2,7 @@ import com.google.gson.Gson
 import com.ndhzs.IConnect
 import com.ndhzs.hotfix.HotfixKotlinPlugin
 import com.ndhzs.hotfix.comand.HotfixCommandSender
+import com.ndhzs.hotfix.suffix.jar.hotfixCoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -18,6 +19,9 @@ class ConnectImpl : IConnect {
   val gson = Gson()
 
   override fun get(): String {
+    hotfixCoroutineScope?.launch {
+    
+    }
     return "123"
 //    return "abc"
   }

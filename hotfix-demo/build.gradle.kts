@@ -18,7 +18,7 @@ dependencies {
 hotfix {
   // 这里用于设置自定义源集并引入该源集单独使用的依赖，且会生成打包该源集的命令 gradlew hotfix-connect
   createHotfix("connect") {
-    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10")
   }
 }
 

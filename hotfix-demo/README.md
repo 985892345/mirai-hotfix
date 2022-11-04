@@ -31,34 +31,47 @@ hotfix {
   }
 }
 ```
-注意：新增源集会自动依赖 `main` 源集，不必重复添加依赖
+**注意:** 新增源集会自动依赖 `main` 源集，不必重复添加依赖
 
 ### 3、编写接口
 你需要定义接口来分离逻辑代码，然后将逻辑代码写在 `connect` 源集中  
 具体方式如下：
 ```kotlin
+///////////////////////////////////////
+//
+//            main 源集中
+//
+///////////////////////////////////////
+
 // 在 main 源集中定义一个接口，必须实现 JarEntrance 接口
 // 注意：为了让该接口更方便寻找，IConnect 只能写在根目录下！
 interface IConnect : JarEntrance {
   fun get(): String
 }
 
-// 在 connect 源集中 java 根目录下实现该接口
+
+///////////////////////////////////////
+//
+//          connect 源集中
+//
+///////////////////////////////////////
+
+// 在 connect 源集中的 java 根目录下实现该接口
 class ConnectImpl : IConnect {
   
   override fun get(): String {
-    hotfixCoroutineScope.launch {
-      // 使用 hotfixCoroutineScope 开协程可以在卸载时自动取消子协程
+    hotfixCoroutineScope?.launch {
+      // 使用 hotfixCoroutineScope 开启协程可以在热修被卸载时自动取消子协程
     }
     return "123"
   }
   
   // 热修加载时的回调
-  // 注意：请使用 HotfixCommandSender 开协程，因为该协程会在卸载时自动取消子协程。suspend 也是同理
+  // 注意：请使用 HotfixCommandSender 开启协程，因为该协程会在卸载时自动取消子协程。suspend 也是同理
   override suspend fun HotfixCommandSender.onFixLoad() {}
   
   // 卸载时的回调，返回值决定了能否支持卸载
-  // 注意：请使用 HotfixCommandSender 开起协程，因为该协程会在卸载时自动取消子协程。suspend 也是同理
+  // 注意：请使用 HotfixCommandSender 开启协程，因为该协程会在卸载时自动取消子协程。suspend 也是同理
   override suspend fun HotfixCommandSender.onFixUnload(): Boolean = true
 }
 ```
