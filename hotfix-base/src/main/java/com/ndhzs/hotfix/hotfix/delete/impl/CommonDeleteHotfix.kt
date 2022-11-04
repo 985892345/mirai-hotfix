@@ -25,14 +25,15 @@ open class CommonDeleteHotfix : IDeleteHotfix {
   ): Exception? {
     if (!loadedFile.exists()) return null
     return try {
-      if (handler.run { onFixUnloadInternal(plugin, loadedFile) }) {
+      if (handler.onFixUnloadInternal(this@delete, plugin, loadedFile)) {
+        delay(20)
         System.gc()
         delay(20)
         withContext(Dispatchers.IO) {
           Files.delete(loadedFile.toPath())
         }
         null
-      } else IllegalStateException("卸载文件失败")
+      } else IllegalStateException("不被允许卸载")
     } catch (e: Exception) {
       e
     }

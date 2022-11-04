@@ -1,7 +1,9 @@
 import com.google.gson.Gson
 import com.ndhzs.IConnect
 import com.ndhzs.hotfix.HotfixKotlinPlugin
-import net.mamoe.mirai.console.command.CommandSender
+import com.ndhzs.hotfix.comand.HotfixCommandSender
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * 实现在 main 源集中定义的 [IConnect] 接口
@@ -16,15 +18,20 @@ class ConnectImpl : IConnect {
   val gson = Gson()
 
   override fun get(): String {
-//    return "123"
-    return "abc"
-//    return gson.toString()
+    return "123"
+//    return "abc"
   }
   
-  override suspend fun CommandSender.onFixLoad(plugin: HotfixKotlinPlugin) {
+  override suspend fun HotfixCommandSender.onFixLoad(plugin: HotfixKotlinPlugin) {
+    launch {
+      while (true) {
+        delay(3000)
+        plugin.logger.info(get())
+      }
+    }
   }
-
-  override suspend fun CommandSender.onFixUnload(plugin: HotfixKotlinPlugin): Boolean {
+  
+  override suspend fun HotfixCommandSender.onFixUnload(plugin: HotfixKotlinPlugin): Boolean {
     return true
   }
 }

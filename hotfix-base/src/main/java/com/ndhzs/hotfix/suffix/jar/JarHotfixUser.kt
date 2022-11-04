@@ -35,8 +35,11 @@ interface JarHotfixUser {
 @Suppress("UNCHECKED_CAST")
 fun <T: JarEntrance> JarHotfixUser.getEntrance(clazz: Class<T>): T? {
   JarHotfixSuffixHandler.jarByFileName.forEach {
-    if (clazz.isAssignableFrom(it.value.entrance.javaClass)) {
-      return it.value.entrance as T
+    it.value.apply {
+      if (clazz.isAssignableFrom(entrance.javaClass)) {
+        hotfixUsers.add(this@getEntrance)
+        return entrance as T
+      }
     }
   }
   return null

@@ -1,7 +1,7 @@
 package com.ndhzs.hotfix.suffix.jar
 
-import com.ndhzs.hotfix.comand.HotfixCommandSender
 import com.ndhzs.hotfix.HotfixKotlinPlugin
+import com.ndhzs.hotfix.comand.HotfixCommandSender
 import com.ndhzs.hotfix.suffix.AbstractHotfixSuffixHandler
 import kotlinx.coroutines.*
 import net.mamoe.mirai.console.command.CommandSender
@@ -17,9 +17,9 @@ import java.util.jar.JarFile
  * **NOTE：** 为了快速读取，启动类规定只能放在 jar 根路径下
  */
 object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
-
+  
   internal val jarByFileName = mutableMapOf<String, Jar>()
-
+  
   override suspend fun CommandSender.onFixLoad(plugin: HotfixKotlinPlugin, file: File) {
     val classLoader = URLClassLoader(arrayOf(file.toURI().toURL()), plugin.javaClass.classLoader)
     val jarFile = withContext(Dispatchers.IO) { JarFile(file) }
@@ -37,24 +37,35 @@ object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
           val clazz = classLoader.loadClass(className.substringBeforeLast("."))
           if (JarEntrance::class.java.isAssignableFrom(clazz)) {
             val entrance = clazz.getDeclaredConstructor().newInstance() as JarEntrance
-            val supervisorJob = plugin.launch {
-            
+            val coroutineScope = CoroutineScope(SupervisorJob(plugin.coroutineContext[Job]))
+            jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableSetOf(), coroutineScope)
+            withContext(coroutineScope.coroutineContext) {
+              // 协程生命周期与热修文件进行绑定
+              HotfixCommandSender(this@onFixLoad, coroutineScope).apply {
+                entrance.apply { onFixLoad(plugin) }
+              }
             }
-            entrance.apply { onFixLoad(plugin) }
-            jarByFileName[file.name] = Jar(file, entrance, classLoader, mutableListOf())
           }
         }
       }
     }
   }
-
+  
   override suspend fun CommandSender.onFixUnload(plugin: HotfixKotlinPlugin, file: File): Boolean {
-    jarByFileName[file.name]?.apply { unload(plugin, this@onFixUnload) }
-    jarByFileName.remove(file.name)
-    return true
+    return jarByFileName[file.name]?.run {
+      withContext(coroutineScope.coroutineContext) {
+        val sender = HotfixCommandSender(this@onFixUnload, coroutineScope)
+        unload(plugin, sender)
+      }.also {
+        if (it) {
+          jarByFileName.remove(file.name)
+          coroutineScope.cancel() // 取消所有子协程
+        }
+      }
+    } ?: false
   }
   
-  override suspend fun onEnable(plugin: HotfixKotlinPlugin, file: File?) {
+  override fun onEnable(plugin: HotfixKotlinPlugin, file: File?) {
     if (file == null) {
       jarByFileName.forEach {
         it.value.entrance.onEnable(plugin)
@@ -64,7 +75,7 @@ object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
     }
   }
   
-  override suspend fun onDisable(plugin: HotfixKotlinPlugin, file: File?) {
+  override fun onDisable(plugin: HotfixKotlinPlugin, file: File?) {
     if (file == null) {
       jarByFileName.forEach {
         it.value.entrance.onDisable(plugin)
@@ -74,13 +85,17 @@ object JarHotfixSuffixHandler : AbstractHotfixSuffixHandler("jar") {
     }
   }
   
-  
+  /**
+   * @param file 热修文件
+   * @param entrance 热修文件的入口
+   *
+   */
   class Jar(
     val file: File,
     val entrance: JarEntrance,
     val classLoader: URLClassLoader,
-    val hotfixUsers: MutableList<JarHotfixUser>,
-    val supervisorJob: Job
+    val hotfixUsers: MutableSet<JarHotfixUser>,
+    val coroutineScope: CoroutineScope
   ) {
     /**
      * 删除 jar

@@ -51,15 +51,16 @@ open class CommonCancelHotfix : ICancelHotfix {
   private suspend fun CommandSender.unloadLoadedFile(
     plugin: HotfixKotlinPlugin,
     loadedFile: File,
-    suffix: AbstractHotfixSuffixHandler
+    handler: AbstractHotfixSuffixHandler
   ) : Exception? {
     if (!loadedFile.exists()) return null
     return try {
-      if (suffix.run { onFixUnloadInternal(plugin, loadedFile) }) {
+      if (handler.onFixUnloadInternal(this, plugin, loadedFile)) {
+        delay(20)
         System.gc()
         delay(20)
         null
-      } else IllegalStateException("不允许卸载")
+      } else IllegalStateException("不被允许卸载")
     } catch (e: Exception) {
       e
     }

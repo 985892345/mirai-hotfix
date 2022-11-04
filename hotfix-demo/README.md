@@ -2,6 +2,7 @@
  此 demo 采用新增源集来使用热修，接入的逻辑很简单，主要分为一下步骤：
 
 ## 1、接入插件
+![Maven Central](https://img.shields.io/maven-central/v/io.github.985892345/mirai-hotfix)
 ```kotlin
 plugins {
   id("io.github.985892345.mirai-hotfix") version "xxx" // 版本号请查看标签
@@ -37,6 +38,7 @@ hotfix {
 具体方式如下：
 ```kotlin
 // 在 main 源集中定义一个接口，必须实现 JarEntrance 接口
+// 注意：为了让该接口更方便寻找，IConnect 只能写在根目录下！
 interface IConnect : JarEntrance {
   fun get(): String
 }
@@ -45,12 +47,19 @@ interface IConnect : JarEntrance {
 class ConnectImpl : IConnect {
   
   override fun get(): String {
+    hotfixCoroutineScope.launch {
+      // 使用 hotfixCoroutineScope 开协程可以在卸载时自动取消子协程
+    }
     return "123"
   }
   
-  override fun CommandSender.onFixLoad() {}
+  // 热修加载时的回调
+  // 注意：请使用 HotfixCommandSender 开协程，因为该协程会在卸载时自动取消子协程。suspend 也是同理
+  override suspend fun HotfixCommandSender.onFixLoad() {}
   
-  override fun CommandSender.onFixUnload(): Boolean = true
+  // 卸载时的回调，返回值决定了能否支持卸载
+  // 注意：请使用 HotfixCommandSender 开起协程，因为该协程会在卸载时自动取消子协程。suspend 也是同理
+  override suspend fun HotfixCommandSender.onFixUnload(): Boolean = true
 }
 ```
 
@@ -61,7 +70,8 @@ class ConnectImpl : IConnect {
 ```
 
 ### 5、进行热修
-上传到你服务器的 Mirai控制台目录/hotfix/id后缀 中
+#### 5.1、手动命令热修
+上传到你服务器的 Mirai控制台目录/hotfix/... 中，三个点取决于你的插件 id 后缀
 ```
 - /bots
 - /config
@@ -76,9 +86,14 @@ class ConnectImpl : IConnect {
 然后在控制台中输入以下指令进行热修
 ```
 fix... reload hotfix-connect.jar 
-// 该三个点取决于你的 id 后缀
+// 该三个点取决于你的 id 后缀，后面文件名称支持正则表达式，也可以直接不写，寻找所有文件
 ```
 
-之后计划开发直接丢群聊文件进行热修的工具
-
+#### 5.2、群文件热修
+在群聊中输入：
+```
+fix... chat
+```
+输入后会监听你发的下一条消息，但只监听一次，你只需要把热修包丢在群里即可自动热修，发送其他东西就取消监听。  
+下载成功后默认会撤回群文件（如果是管理员的话）
 

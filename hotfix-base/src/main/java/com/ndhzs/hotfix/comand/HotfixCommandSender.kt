@@ -1,8 +1,6 @@
 package com.ndhzs.hotfix.comand
 
-import com.ndhzs.hotfix.HotfixKotlinPlugin
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.console.command.CommandSender
 import kotlin.coroutines.CoroutineContext
 
@@ -12,13 +10,16 @@ import kotlin.coroutines.CoroutineContext
  * @email guo985892345@foxmail.com
  * @date 2022/10/28 14:46
  */
+
+/**
+ * @param commandSender 命令的发起人
+ * @param coroutineScope 绑定了热修生命周期的协程作用域，会在卸载时自动取消所有子协程
+ */
 class HotfixCommandSender(
   val commandSender: CommandSender,
-  val hotfixKotlinPlugin: HotfixKotlinPlugin
+  val coroutineScope: CoroutineScope
 ) : CommandSender by commandSender {
   
-  private val hotfixJob = SupervisorJob(hotfixKotlinPlugin.coroutineContext[Job])
-  
   override val coroutineContext: CoroutineContext
-    get() = hotfixJob
+    get() = coroutineScope.coroutineContext
 }

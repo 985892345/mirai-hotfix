@@ -75,13 +75,14 @@ open class CommonReloadHotfix : IReloadHotfix {
     if (!loadedFile.exists()) return null
     return try {
       if (suffix.onFixUnloadInternal(this, plugin, loadedFile)) {
+        delay(20)
         System.gc()
         delay(20)
         withContext(Dispatchers.IO) {
           Files.delete(loadedFile.toPath())
         }
         null
-      } else IllegalStateException("已经加载的文件中存在同名文件，但不允许卸载")
+      } else IllegalStateException("已经加载的文件中存在同名文件，但不被允许卸载")
     } catch (e: Exception) {
       e
     }

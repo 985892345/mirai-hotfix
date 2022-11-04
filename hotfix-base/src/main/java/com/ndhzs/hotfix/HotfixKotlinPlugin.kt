@@ -57,7 +57,7 @@ abstract class HotfixKotlinPlugin(
   final override fun onEnable() {
     super.onEnable()
     hotfixCommand.register()
-    launch { controller.hotfixSuffixHandlers.forEach { it.onEnable(this@HotfixKotlinPlugin, null) } }
+    controller.hotfixSuffixHandlers.forEach { it.onEnable(this@HotfixKotlinPlugin, null) }
     onHotfixEnable()
   }
 
@@ -66,7 +66,7 @@ abstract class HotfixKotlinPlugin(
   final override fun onDisable() {
     super.onDisable()
     hotfixCommand.unregister()
-    launch { controller.hotfixSuffixHandlers.forEach { it.onDisable(this@HotfixKotlinPlugin, null) } }
+    controller.hotfixSuffixHandlers.forEach { it.onDisable(this@HotfixKotlinPlugin, null) }
     onHotfixDisable()
   }
 

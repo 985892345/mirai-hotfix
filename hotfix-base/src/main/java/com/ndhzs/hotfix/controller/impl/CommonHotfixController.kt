@@ -15,7 +15,7 @@ import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.MemberCommandSenderOnMessage
 import net.mamoe.mirai.console.rootDir
-import net.mamoe.mirai.contact.Member
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.message.data.FileMessage
@@ -30,9 +30,9 @@ import java.io.File
  */
 
 /**
- * @param hotfixDirName 热修文件存放的文件夹名称
- * @param loadedDir 返回存放已经加载文件的文件夹名字，receiver 为
- * @param notLoadedDir 返回存在未加载文件的文件夹名字
+ * @param hotfixDirName 热修文件存放的总文件夹名称。该文件放在控制台根目录下
+ * @param loadedDir 返回存放已经加载文件的文件夹名字，receiver 为 hotfixDirName 对应的 File
+ * @param notLoadedDir 返回存在未加载文件的文件夹名字，receiver 为 hotfixDirName 对应的 File
  */
 @Suppress("SuspendFunctionOnCoroutineScope")
 open class CommonHotfixController(
@@ -127,9 +127,15 @@ open class CommonHotfixController(
                 }.onSuccess { notLoadedFile ->
                   result.invoke(reloadHotfix(plugin, Regex(notLoadedFile.name)))
                   if (isWithdrawn) {
-                    runCatching { file.delete() }
+                    if (group.botPermission >= MemberPermission.ADMINISTRATOR) {
+                      runCatching { file.delete() }
+                    }
                   }
                 }
+            }.also { file ->
+              if (file == null) {
+                sendMessage("未上传群文件，热修取消")
+              }
             }
         }
     } else {

@@ -48,7 +48,7 @@ abstract class AbstractHotfixSuffixHandler(val typeSuffix: String) {
    *
    * 在这里你应该做以下几点：
    * - 取消协程和线程
-   * - 取消所有类对该文件的引用
+   * - 取消所有其他包中对该热修文件的引用
    *
    * @param file File 为 .run 文件夹下已加载的文件
    * @return 返回 true，表示能够卸载；返回 false，表示不允许卸载
@@ -60,12 +60,12 @@ abstract class AbstractHotfixSuffixHandler(val typeSuffix: String) {
    * - 如果热修时 plugin 已经处于 Enabled 状态，则会立马回调该方法
    * @param file 为 null 说明是 [HotfixKotlinPlugin.onEnable] 的回调
    */
-  abstract suspend fun onEnable(plugin: HotfixKotlinPlugin, file: File?)
+  abstract fun onEnable(plugin: HotfixKotlinPlugin, file: File?)
   
   /**
    * - 收到 [HotfixKotlinPlugin.onDisable] 时会回调
    * - 调用 [onFixUnload] 前也会回调该方法
    * @param file 为 null 说明是 [HotfixKotlinPlugin.onDisable] 的回调
    */
-  abstract suspend fun onDisable(plugin: HotfixKotlinPlugin, file: File?)
+  abstract fun onDisable(plugin: HotfixKotlinPlugin, file: File?)
 }

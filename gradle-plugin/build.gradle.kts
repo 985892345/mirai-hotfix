@@ -31,7 +31,8 @@ if (gradle.parent!!.startParameter.taskNames.contains(":gradle-plugin:publishPlu
     }
   } else hotfixVersion
   oldVersionFile.writeText(
-    "// 用于记录上一次发布时的版本号，因为 gradle 不允许发布 SNAPSHOT 结尾的插件，所以只能装换为 alpha 版本，然后每次发布自动加 1\n"
+    "// 用于记录上一次发布时的版本号，因为 gradle 不允许发布 SNAPSHOT 结尾的插件，所以只能装换为 alpha 版本，" +
+      "然后每次发布时 alpha 版本自动加 1\n"
       + version.toString()
   )
   
